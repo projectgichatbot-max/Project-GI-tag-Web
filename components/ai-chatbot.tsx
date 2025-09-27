@@ -398,7 +398,7 @@ export function AIChatbot() {
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-2 text-center">
-              Try: "Tell me about Munsiyari Rajma" or click the mic for voice input
+              Try: &quot;Tell me about Munsiyari Rajma&quot; or click the mic for voice input
             </p>
           </div>
         </CardContent>

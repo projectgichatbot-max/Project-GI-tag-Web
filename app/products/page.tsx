@@ -81,7 +81,7 @@ export default function ProductsPage() {
   }, [searchQuery, selectedCategory, selectedRegion, pagination.currentPage])
 
   const filteredProducts = useMemo(() => {
-    let filtered = [...products]
+    const filtered = [...products]
 
     // Sort products based on cultural and educational value
     switch (sortBy) {
@@ -137,7 +137,7 @@ export default function ProductsPage() {
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl text-pretty">
             Discover authentic products with Geographical Indication tags, each telling a unique story of tradition,
-            cultural heritage, and artisan craftsmanship
+            cultural heritage, and artisan craftsmanship.
           </p>
         </div>
       </div>
