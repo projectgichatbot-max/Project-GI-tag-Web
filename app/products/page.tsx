@@ -340,7 +340,7 @@ export default function ProductsPage() {
                           <div className="flex items-center">
                             <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                             <span className="text-sm ml-1">{product.rating}</span>
-                            <span className="text-xs text-muted-foreground ml-1">({product.reviews} reviews)</span>
+                            <span className="text-xs text-muted-foreground ml-1">({product.reviewsCount} reviews)</span>
                           </div>
                           <Badge variant="outline" className="text-xs">
                             Cultural Heritage
@@ -394,7 +394,7 @@ export default function ProductsPage() {
                               <div className="flex items-center mb-1">
                                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                                 <span className="text-sm ml-1">{product.rating}</span>
-                                <span className="text-xs text-muted-foreground ml-1">({product.reviews})</span>
+                                <span className="text-xs text-muted-foreground ml-1">({product.reviewsCount})</span>
                               </div>
                               <Badge variant="outline" className="text-xs">
                                 Cultural Heritage

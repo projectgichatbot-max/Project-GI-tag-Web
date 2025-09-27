@@ -143,8 +143,8 @@ const sampleProducts = [
     culturalSignificance: "Traditional staple food of Kumaon region, often prepared during festivals and special occasions. The beans are considered sacred and are offered in local temples during harvest festivals.",
     images: ["/munsiyari-rajma-kidney-beans-red.jpg"],
     cloudinaryPublicIds: ["uttarakhand-heritage/products/munsiyari-rajma-1"],
-    rating: 4.8,
-    reviews: 124,
+  rating: 4.8,
+  reviewsCount: 124,
     culturalValue: "Traditional staple food of Kumaon region",
     available: true,
     giCertified: true,
@@ -177,7 +177,7 @@ const sampleProducts = [
       "Best served with rice or roti"
     ],
     seasonality: "Harvested in September-October",
-    reviews: [],
+  reviews: [],
     tags: ["organic", "traditional", "healthy", "protein-rich"],
     keywords: ["rajma", "kidney beans", "protein", "organic", "munsiyari", "health", "traditional"]
   },
@@ -191,8 +191,8 @@ const sampleProducts = [
     culturalSignificance: "Sacred art form used in festivals and ceremonies, believed to bring prosperity and ward off evil spirits. Traditionally painted by women during Diwali, weddings, and other auspicious occasions.",
     images: ["/aipan-art-traditional-patterns-geometric.jpg"],
     cloudinaryPublicIds: ["uttarakhand-heritage/products/aipan-art-1"],
-    rating: 4.9,
-    reviews: 89,
+  rating: 4.9,
+  reviewsCount: 89,
     culturalValue: "Sacred art form used in festivals and ceremonies",
     available: true,
     giCertified: true,
@@ -210,7 +210,7 @@ const sampleProducts = [
     dimensions: '12" x 16"',
     materials: "Rice paste, natural ochre, handmade paper",
     careInstructions: "Keep away from moisture and direct sunlight",
-    reviews: [],
+  reviews: [],
     tags: ["art", "traditional", "cultural", "sacred"],
     keywords: ["aipan", "art", "geometric", "sacred", "spiritual", "traditional", "patterns"]
   }
@@ -233,20 +233,20 @@ export async function seedDatabase() {
         console.log('🔥 Using Firebase - clearing collections')
         // Firebase clearing would need to be implemented
       }
-    } catch (error) {
+    } catch {
       console.log('⚠️ Could not clear existing data, continuing...')
     }
     
     // Create artisans first
     console.log('👨‍🌾 Creating artisans...')
-    const createdArtisans = []
+  const createdArtisans: any[] = []
     for (const artisanData of sampleArtisans) {
       try {
         const artisan = await db.createArtisan(artisanData)
         createdArtisans.push(artisan)
         console.log(`✅ Created artisan: ${artisan.name}`)
-      } catch (error) {
-        console.error(`❌ Failed to create artisan ${artisanData.name}:`, error)
+      } catch (err: unknown) {
+        console.error(`❌ Failed to create artisan ${artisanData.name}:`, err)
       }
     }
     
@@ -261,14 +261,14 @@ export async function seedDatabase() {
     
     // Create products
     console.log('🌾 Creating products...')
-    const createdProducts = []
+  const createdProducts: any[] = []
     for (const productData of updatedProducts) {
       try {
         const product = await db.createProduct(productData)
         createdProducts.push(product)
         console.log(`✅ Created product: ${product.name}`)
-      } catch (error) {
-        console.error(`❌ Failed to create product ${productData.name}:`, error)
+      } catch (err: unknown) {
+        console.error(`❌ Failed to create product ${productData.name}:`, err)
       }
     }
     
@@ -285,8 +285,8 @@ export async function seedDatabase() {
           })
           console.log(`✅ Linked product to artisan: ${createdArtisans[i].name}`)
         }
-      } catch (error) {
-        console.error(`❌ Failed to link product to artisan:`, error)
+      } catch (err: unknown) {
+        console.error(`❌ Failed to link product to artisan:`, err)
       }
     }
     
@@ -325,8 +325,8 @@ export async function seedDatabase() {
     try {
       await db.createUser(sampleUser)
       console.log('✅ Created sample user')
-    } catch (error) {
-      console.error('❌ Failed to create sample user:', error)
+    } catch (err: unknown) {
+      console.error('❌ Failed to create sample user:', err)
     }
     
     console.log('🎉 Hybrid database seeding completed successfully!')
@@ -337,9 +337,9 @@ export async function seedDatabase() {
       users: 1,
       database: db.constructor.name
     }
-  } catch (error) {
-    console.error('❌ Error seeding database:', error)
-    throw error
+  } catch (err: unknown) {
+    console.error('❌ Error seeding database:', err)
+    throw err
   }
 }
 

@@ -42,7 +42,8 @@ const getBlogPost = (id: string) => {
   return posts[id as keyof typeof posts] || null
 }
 
-export default function BlogPostPage({ params }: { params: { id: string } }) {
+// Temporarily relax param typing to satisfy Next.js generated PageProps inference
+export default function BlogPostPage({ params }: any) {
   const post = getBlogPost(params.id)
 
   if (!post) {
@@ -67,7 +68,7 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center text-white">
-              <Badge className="mb-4 bg-amber-600 hover:bg-amber-700">{post.category}</Badge>
+              <Badge className="mb-4 bg-amber-600 hover:bg-amber-700 text-white border-transparent">{post.category}</Badge>
               <h1 className="text-3xl md:text-5xl font-bold mb-4 text-balance">{post.title}</h1>
               <div className="flex items-center justify-center gap-6 text-amber-100">
                 <div className="flex items-center gap-2">
@@ -93,7 +94,7 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
           {/* Navigation */}
           <div className="mb-8">
             <Link href="/blog">
-              <Button variant="outline" className="group bg-transparent">
+              <Button className="group bg-transparent border border-input hover:bg-accent hover:text-accent-foreground">
                 <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
                 Back to Blog
               </Button>
@@ -106,7 +107,7 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
               {/* Tags */}
               <div className="flex flex-wrap gap-2 mb-6">
                 {post.tags.map((tag) => (
-                  <Badge key={tag} variant="outline">
+                  <Badge key={tag} className="text-foreground border">
                     {tag}
                   </Badge>
                 ))}
@@ -123,11 +124,11 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
               {/* Article Actions */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <Button variant="outline" size="sm">
+                  <Button className="h-8 rounded-md px-3 text-xs border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground">
                     <Heart className="mr-2 h-4 w-4" />
                     Like Article
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button className="h-8 rounded-md px-3 text-xs border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground">
                     <Share2 className="mr-2 h-4 w-4" />
                     Share
                   </Button>

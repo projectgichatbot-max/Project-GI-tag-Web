@@ -1,12 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server"
-import connectDB from "@/lib/database"
-import { Inquiry } from "@/lib/models/Inquiry"
+import { getDatabaseService } from "@/lib/database-service-fixed"
 
 export async function POST(request: NextRequest) {
   try {
-    await connectDB()
-    
-    const body = await request.json()
+  const db = await getDatabaseService()
+  const body = await request.json()
     const { name, email, subject, message, inquiryType } = body
 
     // Validate required fields
@@ -17,8 +15,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create new inquiry
-    const inquiry = new Inquiry({
+    const savedInquiry: any = await db.createInquiry({
       name,
       email,
       subject: subject || 'General Inquiry',
@@ -30,8 +27,6 @@ export async function POST(request: NextRequest) {
       createdAt: new Date(),
       updatedAt: new Date()
     })
-
-    const savedInquiry = await inquiry.save()
 
     // In production, you would:
     // 1. Send email notification to admin
@@ -45,7 +40,7 @@ export async function POST(request: NextRequest) {
         status: savedInquiry.status,
         message: "Thank you for your inquiry. We will respond within 24 hours.",
         estimatedResponse: "24 hours",
-        ticketNumber: `GI-${savedInquiry._id.toString().slice(-6).toUpperCase()}`
+        ticketNumber: `GI-${savedInquiry._id?.toString?.().slice(-6).toUpperCase()}`
       }
     }, { status: 201 })
   } catch (error) {
@@ -59,7 +54,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    await connectDB()
+  const db = await getDatabaseService()
     
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
@@ -78,18 +73,10 @@ export async function GET(request: NextRequest) {
       filter.priority = priority
     }
     
-    // Calculate skip value
-    const skip = (page - 1) * limit
-    
-    // Get inquiries with pagination
-    const inquiries = await Inquiry.find(filter)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean()
-    
-    // Get total count for pagination
-    const total = await Inquiry.countDocuments(filter)
+  // Get inquiries with pagination via service
+    const raw = await db.getInquiries(filter, { page, limit })
+    const inquiries = raw.data
+    const total = raw.pagination.totalItems
     
     // Calculate pagination info
     const totalPages = Math.ceil(total / limit)

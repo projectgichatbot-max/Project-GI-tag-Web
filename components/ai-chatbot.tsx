@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { MessageCircle, Mic, MicOff, Send, Bot, User, Volume2, X, Minimize2, Maximize2 } from "lucide-react"
-import type { SpeechRecognition } from "types/speech-recognition" // Assuming SpeechRecognition type is declared in a separate file
+// SpeechRecognition ambient type is declared in types/speech.d.ts
 
 interface Message {
   id: string

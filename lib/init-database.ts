@@ -1,5 +1,4 @@
 import { getDatabaseService } from './database-service-fixed'
-import { CloudinaryService } from './cloudinary'
 
 // Sample data for initialization
 const sampleData = {
@@ -136,7 +135,7 @@ const sampleData = {
       images: ["/munsiyari-rajma-kidney-beans-red.jpg"],
       cloudinaryPublicIds: ["uttarakhand-heritage/products/munsiyari-rajma-1"],
       rating: 4.8,
-      reviews: 124,
+  reviewsCount: 124,
       culturalValue: "Traditional staple food of Kumaon region",
       available: true,
       giCertified: true,
@@ -169,7 +168,7 @@ const sampleData = {
         "Best served with rice or roti"
       ],
       seasonality: "Harvested in September-October",
-      reviews: [],
+  reviews: [],
       tags: ["organic", "traditional", "healthy", "protein-rich"],
       keywords: ["rajma", "kidney beans", "protein", "organic", "munsiyari", "health", "traditional"]
     },
@@ -184,7 +183,7 @@ const sampleData = {
       images: ["/aipan-art-traditional-patterns-geometric.jpg"],
       cloudinaryPublicIds: ["uttarakhand-heritage/products/aipan-art-1"],
       rating: 4.9,
-      reviews: 89,
+  reviewsCount: 89,
       culturalValue: "Sacred art form used in festivals and ceremonies",
       available: true,
       giCertified: true,
@@ -202,7 +201,7 @@ const sampleData = {
       dimensions: '12" x 16"',
       materials: "Rice paste, natural ochre, handmade paper",
       careInstructions: "Keep away from moisture and direct sunlight",
-      reviews: [],
+  reviews: [],
       tags: ["art", "traditional", "cultural", "sacred"],
       keywords: ["aipan", "art", "geometric", "sacred", "spiritual", "traditional", "patterns"]
     }
@@ -249,14 +248,15 @@ export async function initializeDatabase() {
     
     // Create artisans
     console.log('👨‍🌾 Creating artisans...')
-    const createdArtisans = []
+  const createdArtisans: any[] = [] // Using any due to abstraction layer returning different shapes (Mongo/Firebase)
     for (const artisanData of sampleData.artisans) {
       try {
         const artisan = await db.createArtisan(artisanData)
         createdArtisans.push(artisan)
         console.log(`✅ Created artisan: ${artisan.name || artisanData.name}`)
-      } catch (error) {
-        console.error(`❌ Failed to create artisan ${artisanData.name}:`, error.message)
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Unknown error'
+        console.error(`❌ Failed to create artisan ${artisanData.name}:`, msg)
       }
     }
     
@@ -271,14 +271,15 @@ export async function initializeDatabase() {
     
     // Create products
     console.log('🌾 Creating products...')
-    const createdProducts = []
+  const createdProducts: any[] = []
     for (const productData of updatedProducts) {
       try {
         const product = await db.createProduct(productData)
         createdProducts.push(product)
         console.log(`✅ Created product: ${product.name || productData.name}`)
-      } catch (error) {
-        console.error(`❌ Failed to create product ${productData.name}:`, error.message)
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Unknown error'
+        console.error(`❌ Failed to create product ${productData.name}:`, msg)
       }
     }
     
@@ -295,8 +296,9 @@ export async function initializeDatabase() {
           })
           console.log(`✅ Linked product to artisan: ${createdArtisans[i].name}`)
         }
-      } catch (error) {
-        console.error(`❌ Failed to link product to artisan:`, error.message)
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Unknown error'
+        console.error(`❌ Failed to link product to artisan:`, msg)
       }
     }
     
@@ -306,8 +308,9 @@ export async function initializeDatabase() {
       try {
         const user = await db.createUser(userData)
         console.log(`✅ Created user: ${user.name || userData.name}`)
-      } catch (error) {
-        console.error(`❌ Failed to create user ${userData.name}:`, error.message)
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Unknown error'
+        console.error(`❌ Failed to create user ${userData.name}:`, msg)
       }
     }
     
@@ -320,11 +323,12 @@ export async function initializeDatabase() {
       users: sampleData.users.length,
       database: db.constructor.name
     }
-  } catch (error) {
-    console.error('❌ Database initialization failed:', error)
+  } catch (err: unknown) {
+    console.error('❌ Database initialization failed:', err)
+    const message = err instanceof Error ? err.message : 'Unknown error'
     return {
       success: false,
-      error: error.message
+      error: message
     }
   }
 }

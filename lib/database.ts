@@ -12,10 +12,16 @@ if (!MONGODB_URI) {
  * in development. This prevents connections growing exponentially
  * during API Route usage.
  */
-let cached = global.mongoose
+interface MongooseCache {
+  conn: typeof mongoose | null
+  promise: Promise<typeof mongoose> | null
+}
+
+let cached: MongooseCache = (globalThis as any).mongoose as MongooseCache
 
 if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null }
+  cached = { conn: null, promise: null }
+  ;(globalThis as any).mongoose = cached
 }
 
 async function connectDB() {
@@ -34,19 +40,23 @@ async function connectDB() {
       bufferCommands: false,
     }
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('✅ Connected to MongoDB')
-      return mongoose
-    }).catch((error) => {
-      console.error('❌ MongoDB connection error:', error)
-      console.log('🔄 Falling back to Firebase database')
-      return null
-    })
+    cached.promise = mongoose
+      .connect(MONGODB_URI, opts)
+      .then((m) => {
+        console.log('✅ Connected to MongoDB')
+        return m
+      })
+      .catch((error) => {
+        console.error('❌ MongoDB connection error:', error)
+        console.log('🔄 Falling back to Firebase database')
+        // Re-throw so outer await catch sets promise null and returns fallback
+        throw error
+      })
   }
 
   try {
     cached.conn = await cached.promise
-  } catch (e) {
+  } catch {
     cached.promise = null
     console.log('🔄 MongoDB connection failed, using Firebase')
     return null
@@ -58,9 +68,4 @@ async function connectDB() {
 export default connectDB
 
 // Extend global type for TypeScript
-declare global {
-  var mongoose: {
-    conn: typeof mongoose | null
-    promise: Promise<typeof mongoose> | null
-  }
-}
+declare global { var mongoose: MongooseCache | undefined }

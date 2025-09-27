@@ -27,7 +27,7 @@ export interface Product {
   culturalSignificance: string
   images: string[]
   rating: number
-  reviews: number
+  reviewsCount: number
   culturalValue: string
   available: boolean
   giCertified: boolean

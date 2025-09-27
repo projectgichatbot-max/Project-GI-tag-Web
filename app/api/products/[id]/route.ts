@@ -1,15 +1,37 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { getDatabaseService } from "@/lib/database-service-fixed"
-import { CloudinaryService } from "@/lib/cloudinary"
+// (Optional) import Cloudinary helpers if/when you add image diff cleanup
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+// Whitelist of fields allowed to be updated to avoid accidental/hostile overwrite
+const ALLOWED_UPDATE_FIELDS = [
+  'name',
+  'category',
+  'region',
+  'description',
+  'culturalSignificance',
+  'tags',
+  'images',
+  'available',
+  'giCertified'
+]
+
+function filterUpdatableFields(data: any) {
+  if (!data || typeof data !== 'object') return {}
+  const clean: Record<string, any> = {}
+  for (const key of ALLOWED_UPDATE_FIELDS) {
+    if (key in data) clean[key] = data[key]
+  }
+  return clean
+}
+
+export async function GET(_req: Request, context: any) {
   try {
     const db = await getDatabaseService()
-    
-    const product = await db.getProductById(params.id)
+    const id = context?.params?.id
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'Missing product id' }, { status: 400 })
+    }
+    const product = await db.getProductById(id)
     
     if (!product) {
       return NextResponse.json(
@@ -31,45 +53,34 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(req: Request, context: any) {
   try {
-    await connectDB()
-    
-    const body = await request.json()
-    
-    // Get existing product to check for image deletions
-    const existingProduct = await Product.findById(params.id)
-    if (!existingProduct) {
-      return NextResponse.json(
-        { success: false, error: 'Product not found' },
-        { status: 404 }
-      )
+    const id = context?.params?.id
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'Missing product id' }, { status: 400 })
     }
-    
-    // Handle image deletions if new images are provided
-    if (body.images && body.cloudinaryPublicIds) {
-      const imagesToDelete = existingProduct.cloudinaryPublicIds.filter(
-        (id: string) => !body.cloudinaryPublicIds.includes(id)
-      )
-      
-      if (imagesToDelete.length > 0) {
-        await CloudinaryService.deleteMultipleImages(imagesToDelete)
-      }
+
+    // Safer JSON parse with 400 feedback
+    let incoming: any
+    try {
+      incoming = await req.json()
+    } catch {
+      return NextResponse.json({ success: false, error: 'Invalid JSON body' }, { status: 400 })
     }
-    
-    // Update product
-    const updatedProduct = await Product.findByIdAndUpdate(
-      params.id,
-      {
-        ...body,
-        updatedAt: new Date()
-      },
-      { new: true, runValidators: true }
-    )
-    
+
+    const db = await getDatabaseService()
+    const existing = await db.getProductById(id)
+    if (!existing) {
+      return NextResponse.json({ success: false, error: 'Product not found' }, { status: 404 })
+    }
+
+    const filtered = filterUpdatableFields(incoming)
+    if (Object.keys(filtered).length === 0) {
+      return NextResponse.json({ success: false, error: 'No valid updatable fields provided' }, { status: 400 })
+    }
+
+    // (Optional) Compare existing.images vs filtered.images and delete removed Cloudinary assets here
+    const updatedProduct = await db.updateProduct(id, { ...filtered, updatedAt: new Date() })
     return NextResponse.json({
       success: true,
       data: updatedProduct,
@@ -84,31 +95,22 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(_req: Request, context: any) {
   try {
-    await connectDB()
-    
-    const product = await Product.findById(params.id)
-    if (!product) {
-      return NextResponse.json(
-        { success: false, error: 'Product not found' },
-        { status: 404 }
-      )
+    const id = context?.params?.id
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'Missing product id' }, { status: 400 })
     }
-    
-    // Delete images from Cloudinary
-    if (product.cloudinaryPublicIds && product.cloudinaryPublicIds.length > 0) {
-      await CloudinaryService.deleteMultipleImages(product.cloudinaryPublicIds)
+    const db = await getDatabaseService()
+    const existing = await db.getProductById(id)
+    if (!existing) {
+      return NextResponse.json({ success: false, error: 'Product not found' }, { status: 404 })
     }
-    
-    // Delete product from database
-    await Product.findByIdAndDelete(params.id)
-    
+    // (Optional) Image cleanup via Cloudinary if you maintain public IDs
+    await db.deleteProduct(id)
     return NextResponse.json({
       success: true,
+      data: { id },
       message: 'Product deleted successfully'
     })
   } catch (error) {

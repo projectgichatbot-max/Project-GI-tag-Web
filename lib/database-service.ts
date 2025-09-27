@@ -442,8 +442,8 @@ class FirebaseDatabaseService implements DatabaseService {
           // Handle OR conditions - Firebase doesn't support OR directly
           // This is a simplified implementation
           return
-        } else if (typeof value === 'object' && value.$regex) {
-          // Handle regex - Firebase doesn't support regex
+        } else if (value && typeof value === 'object' && '$regex' in (value as Record<string, unknown>)) {
+          // Regex queries not supported in Firebase fallback; skip
           return
         } else {
           firebaseFilters.push({
@@ -467,12 +467,12 @@ export async function getDatabaseService(): Promise<DatabaseService> {
       console.log('📊 Using MongoDB as primary database')
       return new MongoDBService()
     }
-  } catch (error) {
+  } catch {
     console.log('📊 MongoDB not available, using Firebase')
   }
   
   console.log('📊 Using Firebase as primary database')
-  return new FirebaseService()
+  return new FirebaseDatabaseService()
 }
 
-export { MongoDBService, FirebaseService }
+export { MongoDBService, FirebaseDatabaseService }

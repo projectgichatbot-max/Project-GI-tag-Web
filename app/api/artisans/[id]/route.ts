@@ -1,14 +1,13 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import connectDB from "@/lib/database"
 import { Artisan } from "@/lib/models/Artisan"
 import { CloudinaryService } from "@/lib/cloudinary"
 
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
+export async function GET(_req: Request, context: any) {
   try {
-    const { params } = context
     await connectDB()
-    
-    const artisan = await Artisan.findById(params.id).lean()
+    const id = context?.params?.id
+    const artisan = await Artisan.findById(id).lean()
     
     if (!artisan) {
       return NextResponse.json(
@@ -30,15 +29,14 @@ export async function GET(request: NextRequest, context: { params: { id: string 
   }
 }
 
-export async function PUT(request: NextRequest, context: { params: { id: string } }) {
+export async function PUT(req: Request, context: any) {
   try {
-    const { params } = context
     await connectDB()
-    
-    const body = await request.json()
+    const body = await req.json()
     
     // Get existing artisan to check for image deletions
-    const existingArtisan = await Artisan.findById(params.id)
+    const id = context?.params?.id
+    const existingArtisan = await Artisan.findById(id)
     if (!existingArtisan) {
       return NextResponse.json(
         { success: false, error: 'Artisan not found' },
@@ -66,7 +64,7 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
     
     // Update artisan
     const updatedArtisan = await Artisan.findByIdAndUpdate(
-      params.id,
+      id,
       {
         ...body,
         updatedAt: new Date()
@@ -88,12 +86,11 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
   }
 }
 
-export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
+export async function DELETE(_req: Request, context: any) {
   try {
-    const { params } = context
     await connectDB()
-    
-    const artisan = await Artisan.findById(params.id)
+    const id = context?.params?.id
+    const artisan = await Artisan.findById(id)
     if (!artisan) {
       return NextResponse.json(
         { success: false, error: 'Artisan not found' },
@@ -112,7 +109,7 @@ export async function DELETE(request: NextRequest, context: { params: { id: stri
     }
     
     // Delete artisan from database
-    await Artisan.findByIdAndDelete(params.id)
+    await Artisan.findByIdAndDelete(id)
     
     return NextResponse.json({
       success: true,

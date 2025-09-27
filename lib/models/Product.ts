@@ -11,7 +11,7 @@ export interface IProduct extends Document {
   images: string[] // Cloudinary URLs
   cloudinaryPublicIds: string[] // For deletion/updates
   rating: number
-  reviews: number
+  reviewsCount: number
   culturalValue: string
   available: boolean
   giCertified: boolean
@@ -66,7 +66,7 @@ const ProductSchema = new Schema<IProduct>({
   images: [{ type: String }], // Cloudinary URLs
   cloudinaryPublicIds: [{ type: String }], // For deletion/updates
   rating: { type: Number, default: 0, min: 0, max: 5 },
-  reviews: { type: Number, default: 0 },
+  reviewsCount: { type: Number, default: 0 },
   culturalValue: { type: String, required: true },
   available: { type: Boolean, default: true },
   giCertified: { type: Boolean, default: false },

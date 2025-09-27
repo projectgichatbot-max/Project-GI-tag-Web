@@ -55,35 +55,27 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    await connectDB()
-    
+    const db = await getDatabaseService()
     const body = await request.json()
-    
-    // Validate required fields
-    const requiredFields = ['name', 'village', 'district', 'region', 'specialization', 'experience', 'bio', 'contact']
-    for (const field of requiredFields) {
-      if (!body[field]) {
-        return NextResponse.json(
-          { success: false, error: `Missing required field: ${field}` },
-          { status: 400 }
-        )
+
+    const required = ['name', 'village', 'district', 'region', 'specialization', 'experience', 'bio']
+    for (const f of required) {
+      if (!body[f]) {
+        return NextResponse.json({ success: false, error: `Missing required field: ${f}` }, { status: 400 })
       }
     }
-    
-    // Create new artisan
-    const artisan = new Artisan({
+
+    const newArtisan = await db.createArtisan({
       ...body,
       tags: body.tags || [],
       keywords: body.keywords || [],
       createdAt: new Date(),
       updatedAt: new Date()
     })
-    
-    const savedArtisan = await artisan.save()
-    
+
     return NextResponse.json({
       success: true,
-      data: savedArtisan,
+      data: newArtisan,
       message: 'Artisan created successfully'
     }, { status: 201 })
   } catch (error) {

@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ["openai"],
-  },
+  // experimental: { serverExternalPackages: ["openai"] }, // Removed: not recognized in this Next.js version
   outputFileTracingRoot: __dirname, // fix root inference warning
 };
 

@@ -1,4 +1,4 @@
-import { CloudinaryService, CLOUDINARY_FOLDERS } from './cloudinary'
+import { CLOUDINARY_FOLDERS } from './cloudinary'
 
 export async function initializeCloudinaryFolders() {
   try {
@@ -59,11 +59,12 @@ export async function initializeCloudinaryFolders() {
       folders: Object.keys(folderStructure),
       message: 'Cloudinary folders structure created successfully'
     }
-  } catch (error) {
-    console.error('❌ Cloudinary initialization failed:', error)
+  } catch (err: unknown) {
+    console.error('❌ Cloudinary initialization failed:', err)
+    const message = err instanceof Error ? err.message : 'Unknown error'
     return {
       success: false,
-      error: error.message
+      error: message
     }
   }
 }

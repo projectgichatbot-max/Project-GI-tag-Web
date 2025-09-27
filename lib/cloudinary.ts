@@ -66,7 +66,12 @@ export class CloudinaryService {
     options: typeof UPLOAD_OPTIONS[keyof typeof UPLOAD_OPTIONS]
   ) {
     try {
-      const result = await cloudinary.uploader.upload(file, {
+      // Cloudinary TS types expect a string (path, remote URL, or data URI). Convert Buffer if provided.
+      const uploadInput = Buffer.isBuffer(file)
+        ? `data:application/octet-stream;base64,${file.toString('base64')}`
+        : file
+
+      const result = await cloudinary.uploader.upload(uploadInput, {
         ...options,
         use_filename: true,
         unique_filename: true,

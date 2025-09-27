@@ -42,7 +42,7 @@ const artisanDetails = {
     ],
     rating: 4.9,
     reviews: 89,
-    products: 12,
+  productsCount: 12,
     achievements: [
       "Master Craftsperson Award 2020",
       "Cultural Heritage Preserver",
@@ -67,26 +67,7 @@ const artisanDetails = {
       "Festival decoration creation",
       "Spiritual symbolism interpretation",
     ],
-    products: [
-      {
-        name: "Traditional Aipan Wall Art",
-        price: "₹1,200",
-        image: "/aipan-art-traditional-patterns-geometric.jpg",
-        rating: 4.9,
-      },
-      {
-        name: "Festival Decoration Set",
-        price: "₹800",
-        image: "/placeholder.svg?key=aipan-festival",
-        rating: 4.8,
-      },
-      {
-        name: "Custom Aipan Design",
-        price: "₹2,000",
-        image: "/placeholder.svg?key=aipan-custom",
-        rating: 5.0,
-      },
-    ],
+    // products removed (e-commerce) – retained cultural/workshop focus
     workshops: [
       {
         title: "Introduction to Aipan Art",
@@ -179,7 +160,7 @@ export default function ArtisanProfilePage() {
                     <span className="ml-1 font-semibold">{artisan.rating}</span>
                     <span className="text-muted-foreground ml-1">({artisan.reviews} reviews)</span>
                   </div>
-                  <span className="text-muted-foreground">{artisan.products} products</span>
+                  <span className="text-muted-foreground">{artisan.productsCount} works</span>
                 </div>
                 <p className="text-muted-foreground mb-6 text-pretty">{artisan.specialization}</p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
@@ -187,14 +168,14 @@ export default function ArtisanProfilePage() {
                     <ShoppingCart className="h-4 w-4 mr-2" />
                     View Products
                   </Button>
-                  <Button variant="outline">
+                  <Button className="border border-input bg-background hover:bg-accent hover:text-accent-foreground">
                     <Phone className="h-4 w-4 mr-2" />
                     Contact
                   </Button>
-                  <Button variant="outline" size="icon">
+                  <Button className="border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 w-9 p-0">
                     <Heart className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="icon">
+                  <Button className="border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 w-9 p-0">
                     <Share2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -241,7 +222,7 @@ export default function ArtisanProfilePage() {
                     <span className="text-sm">{artisan.contact.email}</span>
                   </div>
                 </div>
-                <Button className="w-full mt-4 bg-transparent" variant="outline">
+                <Button className="w-full mt-4 bg-transparent border border-input hover:bg-accent hover:text-accent-foreground">
                   Send Message
                 </Button>
               </CardContent>
@@ -254,7 +235,6 @@ export default function ArtisanProfilePage() {
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="story">Story</TabsTrigger>
             <TabsTrigger value="techniques">Techniques</TabsTrigger>
-            <TabsTrigger value="products">Products</TabsTrigger>
             <TabsTrigger value="workshops">Workshops</TabsTrigger>
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
           </TabsList>
@@ -345,46 +325,6 @@ export default function ArtisanProfilePage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="products" className="mt-8">
-            <div className="max-w-6xl">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold">Featured Products</h3>
-                <Link href={`/products?artisan=${artisan.name}`}>
-                  <Button variant="outline">View All Products</Button>
-                </Link>
-              </div>
-
-              <div className="grid md:grid-cols-3 gap-6">
-                {artisan.products.map((product, index) => (
-                  <Card key={index} className="group hover:shadow-lg transition-all duration-300 border-0">
-                    <CardContent className="p-0">
-                      <div className="relative h-48 overflow-hidden rounded-t-lg">
-                        <Image
-                          src={product.image || "/placeholder.svg"}
-                          alt={product.name}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                      <div className="p-4">
-                        <h4 className="font-semibold mb-2 text-balance">{product.name}</h4>
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="font-semibold text-primary">{product.price}</span>
-                          <div className="flex items-center">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            <span className="text-sm ml-1">{product.rating}</span>
-                          </div>
-                        </div>
-                        <Button className="w-full" size="sm">
-                          View Product
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </TabsContent>
 
           <TabsContent value="workshops" className="mt-8">
             <div className="max-w-4xl">

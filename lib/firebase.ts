@@ -57,26 +57,24 @@ export class FirebaseService {
   ) {
     if (!db) throw new Error('Firebase not initialized')
     
-    let query = db.collection(collection)
-    
-    // Apply filters
+    const colRef = db.collection(collection)
+    let q: FirebaseFirestore.Query = colRef
+
     if (filters) {
-      filters.forEach(filter => {
-        query = query.where(filter.field, filter.operator, filter.value)
-      })
+      for (const filter of filters) {
+        q = (q as FirebaseFirestore.Query).where(filter.field, filter.operator, filter.value)
+      }
     }
-    
-    // Apply ordering
+
     if (orderBy) {
-      query = query.orderBy(orderBy.field, orderBy.direction)
+      q = q.orderBy(orderBy.field, orderBy.direction)
     }
-    
-    // Apply limit
+
     if (limit) {
-      query = query.limit(limit)
+      q = q.limit(limit)
     }
-    
-    const snapshot = await query.get()
+
+    const snapshot = await q.get()
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
   }
 

@@ -145,8 +145,8 @@ const sampleProducts = [
     culturalSignificance: "Traditional staple food of Kumaon region, often prepared during festivals and special occasions. The beans are considered sacred and are offered in local temples during harvest festivals.",
     images: ["/munsiyari-rajma-kidney-beans-red.jpg"],
     cloudinaryPublicIds: ["uttarakhand-heritage/products/munsiyari-rajma-1"],
-    rating: 4.8,
-    reviews: 124,
+  rating: 4.8,
+  reviewsCount: 124,
     culturalValue: "Traditional staple food of Kumaon region",
     available: true,
     giCertified: true,
@@ -179,7 +179,7 @@ const sampleProducts = [
       "Best served with rice or roti"
     ],
     seasonality: "Harvested in September-October",
-    reviews: [],
+  reviews: [],
     tags: ["organic", "traditional", "healthy", "protein-rich"],
     keywords: ["rajma", "kidney beans", "protein", "organic", "munsiyari", "health", "traditional"]
   },
@@ -193,8 +193,8 @@ const sampleProducts = [
     culturalSignificance: "Sacred art form used in festivals and ceremonies, believed to bring prosperity and ward off evil spirits. Traditionally painted by women during Diwali, weddings, and other auspicious occasions.",
     images: ["/aipan-art-traditional-patterns-geometric.jpg"],
     cloudinaryPublicIds: ["uttarakhand-heritage/products/aipan-art-1"],
-    rating: 4.9,
-    reviews: 89,
+  rating: 4.9,
+  reviewsCount: 89,
     culturalValue: "Sacred art form used in festivals and ceremonies",
     available: true,
     giCertified: true,
@@ -212,7 +212,7 @@ const sampleProducts = [
     dimensions: '12" x 16"',
     materials: "Rice paste, natural ochre, handmade paper",
     careInstructions: "Keep away from moisture and direct sunlight",
-    reviews: [],
+  reviews: [],
     tags: ["art", "traditional", "cultural", "sacred"],
     keywords: ["aipan", "art", "geometric", "sacred", "spiritual", "traditional", "patterns"]
   }
@@ -232,7 +232,7 @@ export async function seedDatabase() {
     console.log('🗑️ Cleared existing data')
     
     // Create artisans first
-    const createdArtisans = await Artisan.insertMany(sampleArtisans)
+  const createdArtisans: any[] = await Artisan.insertMany(sampleArtisans)
     console.log(`✅ Created ${createdArtisans.length} artisans`)
     
     // Update product artisan IDs
@@ -240,18 +240,18 @@ export async function seedDatabase() {
       ...product,
       artisan: {
         ...product.artisan,
-        id: createdArtisans[index]._id.toString()
+  id: (createdArtisans[index] as any)._id.toString()
       }
     }))
     
     // Create products
-    const createdProducts = await Product.insertMany(updatedProducts)
+  const createdProducts: any[] = await Product.insertMany(updatedProducts)
     console.log(`✅ Created ${createdProducts.length} products`)
     
     // Update artisan products
     for (let i = 0; i < createdArtisans.length; i++) {
-      await Artisan.findByIdAndUpdate(createdArtisans[i]._id, {
-        products: [createdProducts[i]._id.toString()]
+      await Artisan.findByIdAndUpdate((createdArtisans[i] as any)._id, {
+        products: [(createdProducts[i] as any)._id.toString()]
       })
     }
     
@@ -279,7 +279,7 @@ export async function seedDatabase() {
         points: 0,
         level: "Beginner"
       },
-      savedHeritageItems: [createdProducts[0]._id.toString()],
+  savedHeritageItems: [(createdProducts[0] as any)._id.toString()],
       reviews: [],
       profile: {
         bio: "Interested in learning about Uttarakhand's cultural heritage"
