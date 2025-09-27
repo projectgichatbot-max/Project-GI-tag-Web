@@ -26,6 +26,13 @@ const eslintConfig = [
       "@typescript-eslint/no-explicit-any": "off"
     }
   },
+    // Static content pages contain many natural language apostrophes; disable unescaped entity rule there only
+    {
+      files: ["app/**/*page.tsx"],
+      rules: {
+        "react/no-unescaped-entities": "off"
+      }
+    },
   // Relax rules for internal scripts (seed/init) so deployment build doesn't fail due to helper 'any' usage
   {
     files: [
