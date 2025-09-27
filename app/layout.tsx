@@ -4,7 +4,7 @@ import { Inter, Playfair_Display } from "next/font/google"
 import "./globals.css"
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
-import { AIChatbot } from "@/components/ai-chatbot"
+import { AIChatbot } from "@/components/ai-chatbot-fixed"
 
 const inter = Inter({
   subsets: ["latin"],

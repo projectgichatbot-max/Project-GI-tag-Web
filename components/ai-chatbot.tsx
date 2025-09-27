@@ -199,7 +199,7 @@ export function AIChatbot() {
     }
 
     if (lowerQuery.includes("buy") || lowerQuery.includes("purchase") || lowerQuery.includes("order")) {
-      return "You can explore and purchase our authentic GI-tagged products through our product catalog. Each product page includes detailed information about the artisan, origin, and cultural significance. Would you like me to help you find a specific type of product?"
+      return "This platform focuses on cultural education and heritage preservation. You can explore our authentic GI-tagged products through our product catalog to learn about their cultural significance, health benefits, and traditional uses. Each product page includes detailed information about the artisan, origin, and cultural heritage. Would you like me to help you learn about a specific type of heritage product?"
     }
 
     // Default response for general queries

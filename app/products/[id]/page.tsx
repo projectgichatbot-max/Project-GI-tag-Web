@@ -5,28 +5,44 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  Heart,
-  Share2,
-  MapPin,
-  Star,
-  ShoppingCart,
-  Truck,
-  Shield,
-  Award,
-  Leaf,
-  Users,
-  Calendar,
-  ChevronLeft,
-  Play,
-  Volume2,
-} from "lucide-react"
+import { MapPin, Star, Shield, Award, Leaf, Users, Calendar, ChevronLeft, Play, Volume2 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { useParams } from "next/navigation"
 
-// Sample detailed product data
-const productDetails = {
+// Normalized heritage item type (replaces former commerce-oriented product model)
+interface HeritageItem {
+  id: number
+  name: string
+  category: string
+  region: string
+  description: string
+  longDescription: string
+  images: string[]
+  rating: number
+  reviews: number
+  unit: string
+  healthBenefits: string[]
+  culturalSignificance: string
+  artisan: {
+    name: string
+    location: string
+    experience: string
+    story: string
+  }
+  certifications: string[]
+  availabilityNote?: string
+  nutritionalInfo?: Record<string, string>
+  harvestSeason?: string
+  shelfLife?: string
+  storageInstructions?: string
+  careInstructions?: string
+  dimensions?: string
+  materials?: string
+}
+
+// Sample detailed heritage item data (commerce fields removed)
+const productDetails: Record<number, HeritageItem> = {
   1: {
     id: 1,
     name: "Munsiyari Rajma",
@@ -43,9 +59,7 @@ const productDetails = {
     ],
     rating: 4.8,
     reviews: 124,
-    price: "₹450",
-    originalPrice: "₹500",
-    unit: "per kg",
+    unit: "seed / crop sample",
     healthBenefits: [
       "Rich in iron & calcium",
       "High protein content (22g per 100g)",
@@ -63,8 +77,7 @@ const productDetails = {
       calcium: "143mg",
       calories: "333 kcal",
     },
-    inStock: true,
-    stockQuantity: 45,
+    availabilityNote: "Seasonal harvest sample; educational viewing only",
     artisan: {
       name: "Devi Singh Collective",
       location: "Munsiyari Village",
@@ -93,9 +106,7 @@ const productDetails = {
     ],
     rating: 4.9,
     reviews: 89,
-    price: "₹1,200",
-    originalPrice: "₹1,500",
-    unit: "per piece",
+    unit: "art panel reference",
     healthBenefits: ["Therapeutic art practice", "Stress relief through meditation", "Enhances creativity and focus"],
     culturalSignificance:
       "Sacred art form used in festivals and ceremonies, believed to bring prosperity and ward off evil spirits. Traditionally painted by women during Diwali, weddings, and other auspicious occasions.",
@@ -106,10 +117,16 @@ const productDetails = {
       story:
         "Master artist who learned this traditional art from her grandmother and now teaches it to preserve the cultural heritage.",
     },
-    certifications: ["GI Tagged", "Handicrafts Board Certified"],
+    certifications: ["GI Tagged", "Traditional Craft"],
+    availabilityNote: "Original artwork used for cultural demonstration; not for commercial sale",
     dimensions: '12" x 16"',
     materials: "Rice paste, natural ochre, handmade paper",
     careInstructions: "Keep away from moisture and direct sunlight",
+    // Optional fields (not applicable for this handicraft piece)
+    nutritionalInfo: undefined,
+    harvestSeason: undefined,
+    shelfLife: undefined,
+    storageInstructions: "Handle gently; store flat in cool, dry environment",
   },
 }
 
@@ -119,16 +136,15 @@ export default function ProductDetailPage() {
   const product = productDetails[productId as keyof typeof productDetails]
 
   const [selectedImage, setSelectedImage] = useState(0)
-  const [quantity, setQuantity] = useState(1)
-  const [isWishlisted, setIsWishlisted] = useState(false)
+  // Removed quantity / wishlist (commerce) state
 
   if (!product) {
     return (
       <div className="min-h-screen pt-16 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
-          <Link href="/products">
-            <Button>Back to Products</Button>
+          <Link href="/heritage">
+            <Button>Back to Heritage</Button>
           </Link>
         </div>
       </div>
@@ -145,8 +161,8 @@ export default function ProductDetailPage() {
               Home
             </Link>
             <span className="text-muted-foreground">/</span>
-            <Link href="/products" className="text-muted-foreground hover:text-foreground">
-              Products
+            <Link href="/heritage" className="text-muted-foreground hover:text-foreground">
+              Heritage
             </Link>
             <span className="text-muted-foreground">/</span>
             <span className="text-foreground">{product.name}</span>
@@ -155,13 +171,13 @@ export default function ProductDetailPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <Link href="/products" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6">
+        <Link href="/heritage" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6">
           <ChevronLeft className="h-4 w-4 mr-1" />
-          Back to Products
+          Back to Heritage Items
         </Link>
 
         <div className="grid lg:grid-cols-2 gap-12">
-          {/* Product Images */}
+          {/* Visual Documentation */}
           <div className="space-y-4">
             <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
               <Image
@@ -200,7 +216,7 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          {/* Product Info */}
+          {/* Heritage Item Info */}
           <div className="space-y-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -226,99 +242,27 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Price */}
-            <div className="space-y-2">
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-primary">{product.price}</span>
-                {product.originalPrice && (
-                  <span className="text-lg text-muted-foreground line-through">{product.originalPrice}</span>
-                )}
-                <span className="text-muted-foreground">{product.unit}</span>
-              </div>
-              {product.originalPrice && (
-                <div className="text-sm text-green-600">
-                  Save ₹
-                  {Number.parseInt(product.originalPrice.replace("₹", "")) -
-                    Number.parseInt(product.price.replace("₹", ""))}
-                </div>
-              )}
+            {/* Availability Note */}
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-md text-sm text-amber-800">
+              {product.availabilityNote || "This heritage item is presented for cultural and educational exploration."}
             </div>
 
-            {/* Stock Status */}
-            <div className="flex items-center gap-2">
-              {product.inStock ? (
-                <>
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-green-600 font-medium">In Stock</span>
-                  {product.stockQuantity && (
-                    <span className="text-muted-foreground">({product.stockQuantity} available)</span>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                  <span className="text-red-600 font-medium">Out of Stock</span>
-                </>
-              )}
-            </div>
+            <Button variant="outline" size="lg" className="w-full bg-transparent">
+              <Volume2 className="h-4 w-4 mr-2" />
+              Ask AI Assistant About This Heritage Item
+            </Button>
 
-            {/* Quantity and Actions */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center border rounded-lg">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    disabled={quantity <= 1}
-                  >
-                    -
-                  </Button>
-                  <span className="px-4 py-2 min-w-[3rem] text-center">{quantity}</span>
-                  <Button variant="ghost" size="sm" onClick={() => setQuantity(quantity + 1)}>
-                    +
-                  </Button>
-                </div>
-                <span className="text-muted-foreground">
-                  Total: ₹{Number.parseInt(product.price.replace("₹", "")) * quantity}
-                </span>
-              </div>
-
-              <div className="flex gap-3">
-                <Button size="lg" className="flex-1" disabled={!product.inStock}>
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Add to Cart
-                </Button>
-                <Button variant="outline" size="lg" onClick={() => setIsWishlisted(!isWishlisted)}>
-                  <Heart className={`h-4 w-4 ${isWishlisted ? "fill-red-500 text-red-500" : ""}`} />
-                </Button>
-                <Button variant="outline" size="lg">
-                  <Share2 className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <Button variant="outline" size="lg" className="w-full bg-transparent">
-                <Volume2 className="h-4 w-4 mr-2" />
-                Ask AI Assistant About This Product
-              </Button>
-            </div>
-
-            {/* Key Features */}
-            <div className="grid grid-cols-3 gap-4 py-4 border-t border-b">
-              <div className="text-center">
-                <Truck className="h-6 w-6 mx-auto mb-2 text-primary" />
-                <div className="text-sm font-medium">Free Shipping</div>
-                <div className="text-xs text-muted-foreground">On orders above ₹500</div>
-              </div>
+            {/* Key Authenticity Badges */}
+            <div className="grid grid-cols-2 gap-4 py-4 border-t border-b">
               <div className="text-center">
                 <Shield className="h-6 w-6 mx-auto mb-2 text-primary" />
-                <div className="text-sm font-medium">Authentic</div>
-                <div className="text-xs text-muted-foreground">GI Tagged Product</div>
+                <div className="text-sm font-medium">Authentic GI Heritage</div>
+                <div className="text-xs text-muted-foreground">Verified cultural origin</div>
               </div>
               <div className="text-center">
                 <Award className="h-6 w-6 mx-auto mb-2 text-primary" />
-                <div className="text-sm font-medium">Quality Assured</div>
-                <div className="text-xs text-muted-foreground">Direct from artisans</div>
+                <div className="text-sm font-medium">Documented Tradition</div>
+                <div className="text-xs text-muted-foreground">Preserved knowledge</div>
               </div>
             </div>
           </div>
@@ -338,7 +282,7 @@ export default function ProductDetailPage() {
             <TabsContent value="overview" className="mt-8">
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
-                  <h3 className="text-xl font-semibold mb-4">Product Description</h3>
+                  <h3 className="text-xl font-semibold mb-4">Description</h3>
                   <p className="text-muted-foreground mb-6 text-pretty">{product.longDescription}</p>
 
                   {product.nutritionalInfo && (
@@ -357,10 +301,10 @@ export default function ProductDetailPage() {
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-semibold mb-4">Product Specifications</h3>
+                  <h3 className="text-xl font-semibold mb-4">Cultural Specifications</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between py-2 border-b">
-                      <span>Category</span>
+                        <span>Domain</span>
                       <span className="font-medium">{product.category}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b">
@@ -394,7 +338,7 @@ export default function ProductDetailPage() {
                   </div>
 
                   <div className="mt-6">
-                    <h4 className="font-semibold mb-3">Certifications</h4>
+                    <h4 className="font-semibold mb-3">Recognitions & Certifications</h4>
                     <div className="flex flex-wrap gap-2">
                       {product.certifications.map((cert, index) => (
                         <Badge key={index} variant="outline" className="bg-green-50 text-green-700 border-green-200">
@@ -410,7 +354,7 @@ export default function ProductDetailPage() {
 
             <TabsContent value="health" className="mt-8">
               <div className="max-w-4xl">
-                <h3 className="text-xl font-semibold mb-6">Health Benefits & Nutritional Value</h3>
+                <h3 className="text-xl font-semibold mb-6">Health & Nutritional Context</h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   {product.healthBenefits.map((benefit, index) => (
                     <Card key={index} className="border-0 bg-green-50">
@@ -444,7 +388,7 @@ export default function ProductDetailPage() {
 
             <TabsContent value="cultural" className="mt-8">
               <div className="max-w-4xl">
-                <h3 className="text-xl font-semibold mb-6">Cultural Heritage & Significance</h3>
+                <h3 className="text-xl font-semibold mb-6">Cultural Significance</h3>
                 <Card className="border-0 bg-amber-50">
                   <CardContent className="p-6">
                     <p className="text-amber-800 text-pretty leading-relaxed">{product.culturalSignificance}</p>
@@ -476,7 +420,7 @@ export default function ProductDetailPage() {
 
             <TabsContent value="artisan" className="mt-8">
               <div className="max-w-4xl">
-                <h3 className="text-xl font-semibold mb-6">Meet the Artisan</h3>
+                <h3 className="text-xl font-semibold mb-6">Artisan / Community</h3>
                 <Card>
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-6">
@@ -496,12 +440,8 @@ export default function ProductDetailPage() {
                         <p className="text-muted-foreground text-pretty">{product.artisan.story}</p>
 
                         <div className="mt-4 flex gap-3">
-                          <Button variant="outline" size="sm">
-                            View Profile
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            More Products
-                          </Button>
+                          <Button variant="outline" size="sm">View Profile</Button>
+                          <Button variant="outline" size="sm">More Heritage Items</Button>
                         </div>
                       </div>
                     </div>
@@ -513,8 +453,8 @@ export default function ProductDetailPage() {
             <TabsContent value="reviews" className="mt-8">
               <div className="max-w-4xl">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold">Customer Reviews</h3>
-                  <Button>Write a Review</Button>
+                  <h3 className="text-xl font-semibold">Community Reflections</h3>
+                  <Button variant="outline">Share Insight</Button>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -526,13 +466,13 @@ export default function ProductDetailPage() {
                           <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         ))}
                       </div>
-                      <div className="text-sm text-muted-foreground">{product.reviews} reviews</div>
+                      <div className="text-sm text-muted-foreground">{product.reviews} reflections</div>
                     </CardContent>
                   </Card>
 
                   <Card>
                     <CardContent className="p-6">
-                      <h4 className="font-semibold mb-3">Rating Breakdown</h4>
+                      <h4 className="font-semibold mb-3">Engagement Breakdown</h4>
                       <div className="space-y-2">
                         {[5, 4, 3, 2, 1].map((stars) => (
                           <div key={stars} className="flex items-center gap-2">
@@ -555,7 +495,7 @@ export default function ProductDetailPage() {
 
                   <Card>
                     <CardContent className="p-6">
-                      <h4 className="font-semibold mb-3">Review Highlights</h4>
+                      <h4 className="font-semibold mb-3">Reflection Highlights</h4>
                       <div className="space-y-2">
                         <Badge variant="outline" className="mr-2">
                           Quality
@@ -582,14 +522,14 @@ export default function ProductDetailPage() {
                       rating: 5,
                       date: "2 weeks ago",
                       review:
-                        "Excellent quality Rajma! The taste is authentic and reminds me of my grandmother's cooking. Will definitely order again.",
+                        "Remarkable showcase of traditional Rajma variety. The sensory profile aligns with family memories of mountain harvests.",
                     },
                     {
                       name: "Rajesh Kumar",
                       rating: 4,
                       date: "1 month ago",
                       review:
-                        "Good product, well packaged. The beans cook evenly and have great texture. Slightly expensive but worth it for the quality.",
+                        "Well documented specimen with clear origin notes. Educational value is high for comparative crop studies.",
                     },
                   ].map((review, index) => (
                     <Card key={index}>
@@ -620,40 +560,7 @@ export default function ProductDetailPage() {
           </Tabs>
         </div>
 
-        {/* Related Products */}
-        <div className="mt-16">
-          <h2 className="text-2xl font-serif font-bold mb-8">Related Products</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { name: "Tejpatta (Bay Leaves)", price: "₹200", image: "/placeholder.svg?key=tejpat" },
-              { name: "Chyura Oil", price: "₹350", image: "/placeholder.svg?key=chyura" },
-              { name: "Jhangora Millet", price: "₹180", image: "/placeholder.svg?key=jhangora" },
-              { name: "Himalayan Honey", price: "₹450", image: "/placeholder.svg?key=honey" },
-            ].map((item, index) => (
-              <Card key={index} className="group hover:shadow-lg transition-all duration-300 border-0">
-                <CardContent className="p-0">
-                  <div className="relative h-48 overflow-hidden rounded-t-lg">
-                    <Image
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold mb-2 text-balance">{item.name}</h3>
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-primary">{item.price}</span>
-                      <Button size="sm" variant="outline">
-                        View
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
+        {/* Related Section removed (commerce oriented) */}
       </div>
     </div>
   )

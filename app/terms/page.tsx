@@ -174,7 +174,7 @@ export default function TermsPage() {
                 <ul className="list-disc list-inside text-muted-foreground space-y-2">
                   <li>We facilitate connections but are not responsible for individual transactions</li>
                   <li>Respect artisan time, expertise, and cultural knowledge</li>
-                  <li>Any agreements or purchases are between you and the artisan directly</li>
+                  <li>Any direct interactions with artisans are for educational and cultural exchange purposes</li>
                   <li>Report any inappropriate behavior or cultural misrepresentation</li>
                   <li>Understand that traditional crafts require time and may have seasonal availability</li>
                 </ul>

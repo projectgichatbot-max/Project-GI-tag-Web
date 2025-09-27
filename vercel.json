@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "regions": ["bom1"],
+  "functions": {
+    "app/api/speech/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()" }
+      ]
+    },
+    {
+      "source": "/:all*(svg|jpg|jpeg|png|gif|webp|avif)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/heritage/:path*", "destination": "/products/:path*" }
+  ],
+  "redirects": [
+    { "source": "/products", "destination": "/heritage", "permanent": false }
+  ],
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./ || exit 1",
+  "analytics": { "enabled": true }
+}

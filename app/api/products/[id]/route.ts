@@ -1,84 +1,121 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { getDatabaseService } from "@/lib/database-service-fixed"
+import { CloudinaryService } from "@/lib/cloudinary"
 
-// Mock data - In production, this would come from MongoDB
-const products = [
-  {
-    id: 1,
-    name: "Munsiyari Rajma",
-    category: "Agricultural Products",
-    region: "Munsiyari, Pithoragarh",
-    description:
-      "High-altitude kidney beans rich in protein and minerals, grown in the pristine valleys of Munsiyari at altitudes above 2000 meters.",
-    healthBenefits: [
-      "High protein content (22-24%)",
-      "Rich in iron and potassium",
-      "Good for heart health",
-      "Helps manage diabetes",
-      "High fiber content aids digestion",
-    ],
-    culturalSignificance:
-      "Traditional crop grown in high-altitude regions, essential for mountain communities. These beans have been cultivated for centuries and are integral to local cuisine and festivals.",
-    price: 450,
-    images: ["/munsiyari-rajma-kidney-beans-red.jpg", "/munsiyari-rajma-kidney-beans-organic-uttarakhand.jpg"],
-    inStock: true,
-    giCertified: true,
-    giRegistrationNumber: "GI-2019-0123",
-    artisan: {
-      id: 1,
-      name: "Rajesh Negi",
-      village: "Munsiyari",
-      district: "Pithoragarh",
-      experience: "25 years",
-      specialization: "Organic farming",
-      contact: "rajesh.negi@example.com",
-      bio: "Rajesh has been practicing organic farming in the high altitudes of Munsiyari for over two decades.",
-    },
-    nutritionalInfo: {
-      protein: "22g per 100g",
-      carbohydrates: "60g per 100g",
-      fiber: "15g per 100g",
-      iron: "8mg per 100g",
-      potassium: "1200mg per 100g",
-    },
-    cookingInstructions: [
-      "Soak beans overnight in water",
-      "Pressure cook for 15-20 minutes",
-      "Season with traditional spices",
-      "Best served with rice or roti",
-    ],
-    seasonality: "Harvested in September-October",
-    storageInstructions: "Store in cool, dry place. Use within 12 months.",
-    reviews: [
-      {
-        id: 1,
-        user: "Priya Sharma",
-        rating: 5,
-        comment: "Excellent quality beans with authentic taste. Perfect for traditional recipes.",
-        date: "2024-01-10",
-      },
-      {
-        id: 2,
-        user: "Amit Kumar",
-        rating: 4,
-        comment: "Good quality, though slightly expensive. Worth it for the authenticity.",
-        date: "2024-01-05",
-      },
-    ],
-  },
-]
-
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const productId = Number.parseInt(params.id)
-    const product = products.find((p) => p.id === productId)
-
+    const db = await getDatabaseService()
+    
+    const product = await db.getProductById(params.id)
+    
     if (!product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 })
+      return NextResponse.json(
+        { success: false, error: 'Product not found' },
+        { status: 404 }
+      )
     }
-
-    return NextResponse.json(product)
+    
+    return NextResponse.json({
+      success: true,
+      data: product
+    })
   } catch (error) {
-    console.error("Error fetching product:", error)
-    return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 })
+    console.error('Error fetching product:', error)
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch product' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connectDB()
+    
+    const body = await request.json()
+    
+    // Get existing product to check for image deletions
+    const existingProduct = await Product.findById(params.id)
+    if (!existingProduct) {
+      return NextResponse.json(
+        { success: false, error: 'Product not found' },
+        { status: 404 }
+      )
+    }
+    
+    // Handle image deletions if new images are provided
+    if (body.images && body.cloudinaryPublicIds) {
+      const imagesToDelete = existingProduct.cloudinaryPublicIds.filter(
+        (id: string) => !body.cloudinaryPublicIds.includes(id)
+      )
+      
+      if (imagesToDelete.length > 0) {
+        await CloudinaryService.deleteMultipleImages(imagesToDelete)
+      }
+    }
+    
+    // Update product
+    const updatedProduct = await Product.findByIdAndUpdate(
+      params.id,
+      {
+        ...body,
+        updatedAt: new Date()
+      },
+      { new: true, runValidators: true }
+    )
+    
+    return NextResponse.json({
+      success: true,
+      data: updatedProduct,
+      message: 'Product updated successfully'
+    })
+  } catch (error) {
+    console.error('Error updating product:', error)
+    return NextResponse.json(
+      { success: false, error: 'Failed to update product' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connectDB()
+    
+    const product = await Product.findById(params.id)
+    if (!product) {
+      return NextResponse.json(
+        { success: false, error: 'Product not found' },
+        { status: 404 }
+      )
+    }
+    
+    // Delete images from Cloudinary
+    if (product.cloudinaryPublicIds && product.cloudinaryPublicIds.length > 0) {
+      await CloudinaryService.deleteMultipleImages(product.cloudinaryPublicIds)
+    }
+    
+    // Delete product from database
+    await Product.findByIdAndDelete(params.id)
+    
+    return NextResponse.json({
+      success: true,
+      message: 'Product deleted successfully'
+    })
+  } catch (error) {
+    console.error('Error deleting product:', error)
+    return NextResponse.json(
+      { success: false, error: 'Failed to delete product' },
+      { status: 500 }
+    )
   }
 }

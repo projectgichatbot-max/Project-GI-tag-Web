@@ -48,9 +48,9 @@ export const schemas = {
     description: String,
     healthBenefits: [String],
     culturalSignificance: String,
-    price: Number,
+    // Removed commercial fields (price, stock) – site is educational
     images: [String],
-    inStock: Boolean,
+    availabilityNote: String, // textual educational availability/context note
     giCertified: Boolean,
     giRegistrationNumber: String,
     artisan: {
@@ -92,7 +92,7 @@ export const schemas = {
     preferences: Object,
     culturalInterests: [String],
     learningProgress: Object,
-    wishlist: [Number],
+    savedHeritageItems: [Number], // renamed from wishlist (non‑commercial)
     reviews: [Object],
     createdAt: Date,
     updatedAt: Date,

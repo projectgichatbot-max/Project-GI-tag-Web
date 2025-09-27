@@ -226,7 +226,7 @@ export default function AboutPage() {
                   <div>
                     <h3 className="font-semibold mb-2">Direct Artisan Support</h3>
                     <p className="text-muted-foreground text-pretty">
-                      Your purchases directly support traditional craftspeople and their communities
+                      Your engagement directly supports traditional craftspeople and their communities
                     </p>
                   </div>
                 </div>
@@ -306,7 +306,7 @@ export default function AboutPage() {
           <h2 className="text-3xl font-serif font-bold mb-6 text-balance">Join Us in Preserving Cultural Heritage</h2>
           <p className="text-lg text-muted-foreground mb-8 text-pretty">
             Be part of our mission to preserve Uttarakhand's rich cultural heritage while supporting local artisans and
-            communities. Every purchase makes a difference.
+            communities. Every interaction makes a difference.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/products">

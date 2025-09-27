@@ -455,7 +455,7 @@ export default function HeritagePage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-serif font-bold mb-6 text-balance">Experience Uttarakhand's Living Heritage</h2>
           <p className="text-lg text-muted-foreground mb-8 text-pretty">
-            Every product you explore and purchase helps preserve these ancient traditions and supports the artisan
+            Every product you explore and learn about helps preserve these ancient traditions and supports cultural heritage
             communities who keep them alive.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -548,9 +548,9 @@ export default function ArtisansPage() {
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Direct Support</h3>
                 <p className="text-muted-foreground mb-4 text-pretty">
-                  Purchase directly from artisans, ensuring fair prices and sustainable income for their families.
+                  Connect with artisans to learn about their traditional techniques and cultural heritage.
                 </p>
-                <Button variant="outline">Shop Products</Button>
+                <Button variant="outline">Explore Heritage</Button>
               </CardContent>
             </Card>
 

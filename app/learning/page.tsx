@@ -1,11 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { BookOpen, Heart, Search, Filter, MapPin, Clock, Award } from "lucide-react"
+import { Button } from "../../components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
+import { Badge } from "../../components/ui/badge"
+import { Input } from "../../components/ui/input"
+import { BookOpen, Heart, Search, Filter, MapPin, Clock, Award, Mic } from "lucide-react"
+import { SpeechConsole } from '../../components/speech-console'
 import Image from "next/image"
 import Link from "next/link"
 
@@ -77,7 +78,7 @@ export default function LearningPage() {
             Save cultural heritage topics and traditional crafts to create your personalized learning path
           </p>
           <Link href="/products">
-            <Button size="lg" className="bg-primary hover:bg-primary/90">
+            <Button className="bg-primary hover:bg-primary/90 h-10 px-8">
               Explore Heritage Products
             </Button>
           </Link>
@@ -98,11 +99,11 @@ export default function LearningPage() {
             </p>
           </div>
           <div className="flex items-center space-x-2 mt-4 md:mt-0">
-            <Button variant="outline">
+            <Button className="border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground">
               <Award className="h-4 w-4 mr-2" />
               View Achievements
             </Button>
-            <Button variant="outline">
+            <Button className="border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground">
               <Filter className="h-4 w-4 mr-2" />
               Filter Topics
             </Button>
@@ -128,15 +129,13 @@ export default function LearningPage() {
                 <div className="relative h-48 overflow-hidden rounded-t-lg">
                   <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
                   <div className="absolute top-2 left-2">
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge className="text-xs border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
                       {item.type}
                     </Badge>
                   </div>
                   <div className="absolute top-2 right-2">
                     <Button
-                      size="sm"
-                      variant="ghost"
-                      className="bg-white/80 hover:bg-white h-8 w-8 p-0"
+                      className="bg-white/80 hover:bg-white h-8 w-8 p-0 hover:text-accent"
                       onClick={() => removeFromLearning(item.id)}
                     >
                       <Heart className="h-4 w-4 fill-red-500 text-red-500" />
@@ -173,14 +172,14 @@ export default function LearningPage() {
                         <Clock className="h-3 w-3 mr-1" />
                         {item.timeToComplete}
                       </div>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge className="text-xs border text-foreground">
                         {item.difficulty}
                       </Badge>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Button className="w-full" size="sm">
+                    <Button className="w-full h-8 text-xs">
                       {item.progress === 100 ? "Review" : item.progress > 0 ? "Continue Learning" : "Start Learning"}
                     </Button>
                     <p className="text-xs text-muted-foreground text-center">Added {item.addedDate}</p>
@@ -198,6 +197,19 @@ export default function LearningPage() {
             <p className="text-muted-foreground">Try adjusting your search terms or explore more heritage products</p>
           </div>
         )}
+
+        {/* Speech Learning Assistant */}
+        <div className="mt-16 mb-20">
+          <div className="flex items-center gap-3 mb-4">
+            <Mic className="h-5 w-5 text-primary" />
+            <h2 className="text-xl font-serif font-semibold">Voice Learning Assistant</h2>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4 max-w-prose">
+            Record short reflections or questions in Hindi / English and get instant transcription. This helps you
+            capture oral narratives while studying heritage topics.
+          </p>
+          <SpeechConsole />
+        </div>
 
         {/* Learning Progress Summary */}
         <Card className="border-0 shadow-lg">
