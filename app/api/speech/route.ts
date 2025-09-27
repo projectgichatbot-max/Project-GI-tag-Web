@@ -1,5 +1,12 @@
 import { NextRequest } from 'next/server'
-import OpenAI from 'openai'
+// Lazy import OpenAI to avoid bundling issues during build (some internal files not resolved in edge analyzer)
+let _openai: any = null
+async function getOpenAI() {
+  if (_openai) return _openai
+  const mod = await import('openai')
+  _openai = new mod.default({ apiKey: process.env.OPENAI_API_KEY })
+  return _openai
+}
 
 // Production-oriented speech-to-text endpoint using OpenAI Whisper (reliable quality)
 // Expects multipart/form-data or JSON with base64 audio; returns { text }
@@ -8,7 +15,6 @@ import OpenAI from 'openai'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,8 +44,9 @@ export async function POST(req: NextRequest) {
       if (typeof body.lang === 'string') language = body.lang
     }
 
-    // Whisper supports many formats; webm/ogg/mp3/m4a fine.
-    const transcription = await openai.audio.transcriptions.create({
+  // Whisper supports many formats; webm/ogg/mp3/m4a fine.
+  const openai = await getOpenAI()
+  const transcription = await openai.audio.transcriptions.create({
       model: 'gpt-4o-transcribe',
       file,
       response_format: 'json',

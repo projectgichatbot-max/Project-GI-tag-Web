@@ -3,11 +3,9 @@ import connectDB from "@/lib/database"
 import { Artisan } from "@/lib/models/Artisan"
 import { CloudinaryService } from "@/lib/cloudinary"
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, context: { params: { id: string } }) {
   try {
+    const { params } = context
     await connectDB()
     
     const artisan = await Artisan.findById(params.id).lean()
@@ -32,11 +30,9 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, context: { params: { id: string } }) {
   try {
+    const { params } = context
     await connectDB()
     
     const body = await request.json()
@@ -92,11 +88,9 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
   try {
+    const { params } = context
     await connectDB()
     
     const artisan = await Artisan.findById(params.id)
