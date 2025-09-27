@@ -4,7 +4,7 @@ let _openai: any = null
 async function getOpenAI() {
   if (_openai) return _openai
   const mod = await import('openai')
-  _openai = new mod.default({ apiKey: process.env.OPENAI_API_KEY })
+  _openai = new mod.OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   return _openai
 }
 
@@ -46,15 +46,12 @@ export async function POST(req: NextRequest) {
 
   // Whisper supports many formats; webm/ogg/mp3/m4a fine.
   const openai = await getOpenAI()
-  const transcription = await openai.audio.transcriptions.create({
+    const transcription = await openai.audio.transcriptions.create({
       model: 'gpt-4o-transcribe',
       file,
-      response_format: 'json',
       ...(language ? { language } : {}),
-    })
-    const text = typeof (transcription as unknown as { text?: string })?.text === 'string'
-      ? (transcription as unknown as { text?: string }).text!
-      : ''
+    }) as any
+    const text = transcription?.text || ''
     return new Response(JSON.stringify({ text }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

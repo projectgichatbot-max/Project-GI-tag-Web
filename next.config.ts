@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    serverComponentsExternalPackages: ["openai"],
+  },
+  outputFileTracingRoot: __dirname, // fix root inference warning
 };
 
 export default nextConfig;
