@@ -20,6 +20,7 @@ const navigationItems = [
     ],
   },
   { name: "Artisans", href: "/artisans" },
+  { name: "Workshops", href: "/workshops" },
   {
     name: "Heritage",
     href: "/heritage",

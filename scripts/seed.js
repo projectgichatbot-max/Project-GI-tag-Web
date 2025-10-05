@@ -1,4 +1,4 @@
-const { seedDatabase } = require('../lib/seed.ts')
+import { seedDatabase } from '../lib/seed.ts'
 
 async function main() {
   try {
