@@ -4,7 +4,6 @@ import path from 'path'
 
 console.log('🚀 Starting complete initialization...');
 
-// 1. Create .env.local file
 const envContent = `# Database Configuration
 MONGODB_URI=mongodb://localhost:27017/uttarakhand_gi_products
 MONGODB_DB_NAME=uttarakhand_gi_products

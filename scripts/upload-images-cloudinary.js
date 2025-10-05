@@ -1,4 +1,3 @@
-// Upload sample images from public folder to Cloudinary
 import dotenv from 'dotenv'
 dotenv.config({ path: '.env.local' })
 import { v2 as cloudinary } from 'cloudinary'
