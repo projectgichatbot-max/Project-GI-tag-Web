@@ -22,7 +22,6 @@ export interface IArtisan extends Document {
   workshopsOffered: Array<{
     title: string
     duration: string
-    price: number
     description: string
     maxParticipants: number
     available: boolean
@@ -84,7 +83,6 @@ const ArtisanSchema = new Schema<IArtisan>({
   workshopsOffered: [{
     title: { type: String, required: true },
     duration: { type: String, required: true },
-    price: { type: Number, required: true },
     description: { type: String, required: true },
     maxParticipants: { type: Number, default: 10 },
     available: { type: Boolean, default: true }

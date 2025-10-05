@@ -32,7 +32,6 @@ const sampleArtisans = [
       {
         title: "Organic Farming Techniques",
         duration: "2 days",
-        price: 2500,
         description: "Learn traditional organic farming methods used in high-altitude regions",
         maxParticipants: 15,
         available: true
@@ -40,7 +39,6 @@ const sampleArtisans = [
       {
         title: "Seed Preservation Workshop",
         duration: "1 day",
-        price: 1500,
         description: "Traditional methods of preserving indigenous seeds",
         maxParticipants: 10,
         available: true
@@ -97,7 +95,6 @@ const sampleArtisans = [
       {
         title: "Aipan Art Workshop",
         duration: "3 days",
-        price: 3000,
         description: "Learn the sacred art of Aipan with traditional techniques",
         maxParticipants: 12,
         available: true

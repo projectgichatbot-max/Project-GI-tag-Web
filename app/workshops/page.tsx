@@ -22,7 +22,6 @@ export default function WorkshopsPage() {
       instructorImage: "/uttarakhand-artisan-working-traditional-craft-work.jpg",
       category: "Art & Craft",
       duration: "3 days",
-      price: 3000,
       maxParticipants: 12,
       rating: 4.9,
       reviews: 45,
@@ -45,7 +44,6 @@ export default function WorkshopsPage() {
       instructorImage: "/uttarakhand-artisan-working-traditional-craft-work.jpg",
       category: "Agriculture",
       duration: "2 days",
-      price: 2500,
       maxParticipants: 15,
       rating: 4.8,
       reviews: 38,
@@ -68,7 +66,6 @@ export default function WorkshopsPage() {
       instructorImage: "/uttarakhand-artisan-working-traditional-craft-work.jpg",
       category: "Textile",
       duration: "5 days",
-      price: 4500,
       maxParticipants: 10,
       rating: 4.7,
       reviews: 32,
@@ -91,7 +88,6 @@ export default function WorkshopsPage() {
       instructorImage: "/uttarakhand-artisan-working-traditional-craft-work.jpg",
       category: "Art & Craft",
       duration: "4 days",
-      price: 3500,
       maxParticipants: 12,
       rating: 4.6,
       reviews: 28,
@@ -276,13 +272,14 @@ export default function WorkshopsPage() {
                   </div>
 
                   <div className="flex items-center justify-between pt-4 border-t">
-                    <div>
-                      <p className="text-2xl font-bold">₹{workshop.price.toLocaleString()}</p>
-                      <p className="text-xs text-muted-foreground">per participant</p>
+                    <div className="flex-1">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Free cultural education workshop supported by local artisans
+                      </p>
                     </div>
                     <Link href={`/contact?workshop=${workshop.id}`}>
                       <Button>
-                        Register Now
+                        Express Interest
                       </Button>
                     </Link>
                   </div>
