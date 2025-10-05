@@ -172,9 +172,9 @@ export default function TermsPage() {
               <div className="space-y-4">
                 <p className="text-muted-foreground mb-4">When connecting with artisans through our platform:</p>
                 <ul className="list-disc list-inside text-muted-foreground space-y-2">
-                  <li>We facilitate connections but are not responsible for individual transactions</li>
+                  <li>We facilitate connections for cultural education and heritage preservation</li>
                   <li>Respect artisan time, expertise, and cultural knowledge</li>
-                  <li>Any direct interactions with artisans are for educational and cultural exchange purposes</li>
+                  <li>All interactions with artisans are for educational and cultural exchange purposes</li>
                   <li>Report any inappropriate behavior or cultural misrepresentation</li>
                   <li>Understand that traditional crafts require time and may have seasonal availability</li>
                 </ul>

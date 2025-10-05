@@ -43,11 +43,6 @@ export default function SupportPage() {
       answer:
         "We welcome skilled artisans who create authentic GI-tagged products. You'll need to provide proof of traditional skills, product samples, and GI certification (if applicable). Contact our artisan relations team for the application process.",
     },
-    {
-      question: "What payment methods do you accept?",
-      answer:
-        "We accept all major credit/debit cards, UPI, net banking, and digital wallets. For bulk orders, we also accept bank transfers. All transactions are secured with industry-standard encryption.",
-    },
   ]
 
   const guides = [

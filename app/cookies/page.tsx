@@ -63,7 +63,6 @@ export default function CookiesPolicyPage() {
                 <li>Authentication and security</li>
                 <li>Session management</li>
                 <li>Load balancing</li>
-                <li>Shopping cart functionality</li>
               </ul>
             </CardContent>
           </Card>
