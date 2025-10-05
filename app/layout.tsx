@@ -22,6 +22,11 @@ export const metadata: Metadata = {
     "Discover authentic GI-tagged products from Uttarakhand. Support local artisans and preserve cultural heritage through traditional handicrafts, organic foods, and textiles.",
   keywords:
     "Uttarakhand, GI tagged products, handicrafts, artisans, cultural heritage, organic food, traditional textiles",
+  icons: {
+    icon: '/favicon.jpg',
+    shortcut: '/favicon.jpg',
+    apple: '/favicon.jpg',
+  },
 }
 
 export default function RootLayout({
