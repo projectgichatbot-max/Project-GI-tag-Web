@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { MapPin, Heart, Star, ChevronRight, Mountain, Leaf, Users } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 export default function HomePage() {
   return (
@@ -32,17 +33,21 @@ export default function HomePage() {
             the Himalayas
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-accent hover:bg-accent/90 text-white">
-              Explore Products
-              <ChevronRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-primary bg-transparent"
-            >
-              Meet Artisans
-            </Button>
+            <Link href="/heritage">
+              <Button size="lg" className="bg-accent hover:bg-accent/90 text-white">
+                Explore Heritage
+                <ChevronRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+            <Link href="/artisans">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white text-white hover:bg-white hover:text-primary bg-transparent"
+              >
+                Meet Artisans
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -57,7 +62,7 @@ export default function HomePage() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-card">
+          <Card className="group hover:shadow-lg transition-all duration-300 border bg-white">
             <CardContent className="p-0">
               <div className="relative h-64 overflow-hidden rounded-t-lg">
                 <Image
@@ -82,7 +87,7 @@ export default function HomePage() {
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-card">
+          <Card className="group hover:shadow-lg transition-all duration-300 border bg-white">
             <CardContent className="p-0">
               <div className="relative h-64 overflow-hidden rounded-t-lg">
                 <Image
@@ -107,7 +112,7 @@ export default function HomePage() {
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-card">
+          <Card className="group hover:shadow-lg transition-all duration-300 border bg-white">
             <CardContent className="p-0">
               <div className="relative h-64 overflow-hidden rounded-t-lg">
                 <Image
@@ -265,9 +270,9 @@ export default function HomePage() {
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                       <span className="text-sm ml-1">{product.rating}</span>
                     </div>
-                    <Button size="sm" variant="ghost" className="text-primary">
-                      View Details
-                    </Button>
+                  <Link href={`/heritage`}>
+                    <Button size="sm" variant="ghost" className="text-primary">View Details</Button>
+                  </Link>
                   </div>
                 </div>
               </CardContent>
@@ -276,10 +281,12 @@ export default function HomePage() {
         </div>
 
         <div className="text-center mt-12">
-          <Button size="lg" className="bg-primary hover:bg-primary/90">
-            View All Products
-            <ChevronRight className="ml-2 h-5 w-5" />
-          </Button>
+          <Link href="/heritage">
+            <Button size="lg" className="bg-primary hover:bg-primary/90">
+              Explore More Heritage
+              <ChevronRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </section>
     </div>

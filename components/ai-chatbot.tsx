@@ -276,7 +276,7 @@ export function AIChatbot() {
 
   return (
     <Card
-      className={`fixed bottom-6 right-6 w-96 shadow-2xl z-50 transition-all duration-300 ${
+      className={`fixed bottom-6 right-6 w-96 shadow-2xl z-50 transition-all duration-300 bg-white dark:bg-gray-900 ${
         isMinimized ? "h-16" : "h-[600px]"
       }`}
     >
@@ -309,8 +309,8 @@ export function AIChatbot() {
       </CardHeader>
 
       {!isMinimized && (
-        <CardContent className="flex flex-col h-[calc(600px-80px)] p-0">
-          <ScrollArea className="flex-1 p-4">
+        <CardContent className="flex flex-col h-[calc(600px-80px)] p-0 bg-white dark:bg-gray-900">
+          <ScrollArea className="flex-1 p-4 bg-white dark:bg-gray-900">
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
@@ -374,7 +374,7 @@ export function AIChatbot() {
             </div>
           </ScrollArea>
 
-          <div className="p-4 border-t">
+          <div className="p-4 border-t bg-white dark:bg-gray-900">
             <div className="flex space-x-2">
               <Input
                 value={inputValue}

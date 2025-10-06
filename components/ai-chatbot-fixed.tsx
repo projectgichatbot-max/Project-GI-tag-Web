@@ -66,6 +66,16 @@ export function AIChatbot() {
     }
   }, [])
 
+  // Open on query param ?chat=1
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('chat') === '1') {
+        setIsOpen(true)
+      }
+    }
+  }, [])
+
   // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -173,7 +183,7 @@ export function AIChatbot() {
 
   return (
     <Card
-      className={`fixed bottom-6 right-6 w-96 shadow-2xl z-50 transition-all duration-300 ${
+      className={`fixed bottom-6 right-6 w-96 shadow-2xl z-50 transition-all duration-300 bg-slate-900 text-white border border-slate-800 rounded-lg overflow-hidden ${
         isMinimized ? "h-16" : "h-[600px]"
       }`}
     >
@@ -206,7 +216,7 @@ export function AIChatbot() {
       </CardHeader>
 
       {!isMinimized && (
-        <CardContent className="p-0 flex flex-col h-[calc(100%-4rem)]">
+        <CardContent className="p-0 flex flex-col h-[calc(100%-4rem)] bg-slate-900">
           <ScrollArea className="flex-1 p-4">
             <div className="space-y-4">
               {messages.map((message) => (
@@ -218,7 +228,7 @@ export function AIChatbot() {
                     className={`max-w-[80%] rounded-lg p-3 ${
                       message.type === "user"
                         ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
+                        : "bg-slate-800 text-white"
                     }`}
                   >
                     <div className="flex items-start space-x-2">
@@ -243,13 +253,13 @@ export function AIChatbot() {
               ))}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                  <div className="bg-slate-800 text-white rounded-lg p-3 max-w-[80%]">
                     <div className="flex items-center space-x-2">
                       <Bot className="h-4 w-4" />
                       <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" />
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                        <div className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" />
+                        <div className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                        <div className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
                       </div>
                     </div>
                   </div>
@@ -259,12 +269,12 @@ export function AIChatbot() {
             <div ref={messagesEndRef} />
           </ScrollArea>
 
-          <div className="p-4 border-t">
+          <div className="p-4 border-t border-slate-800">
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
                 size="icon"
-                className="h-10 w-10"
+                className="h-10 w-10 border-slate-700 text-white hover:bg-slate-800"
                 onClick={toggleListening}
                 disabled={isLoading}
               >
@@ -279,7 +289,7 @@ export function AIChatbot() {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask about heritage products, artisans, or culture..."
-                className="flex-1"
+                className="flex-1 bg-slate-800 border-slate-700 text-white placeholder:text-slate-400"
                 disabled={isLoading}
               />
               <Button
@@ -291,7 +301,7 @@ export function AIChatbot() {
                 <Send className="h-4 w-4" />
               </Button>
             </div>
-            <div className="mt-2 text-xs text-muted-foreground text-center">
+            <div className="mt-2 text-xs text-slate-300 text-center">
               {isListening ? "Listening..." : "Type or use voice to ask questions"}
             </div>
           </div>

@@ -9,16 +9,6 @@ import { usePathname } from "next/navigation"
 
 const navigationItems = [
   { name: "Home", href: "/" },
-  {
-    name: "Heritage Products",
-    href: "/products",
-    submenu: [
-      { name: "All Products", href: "/products" },
-      { name: "Handicrafts", href: "/products?category=Handicraft" },
-      { name: "Agricultural", href: "/products?category=Agricultural" },
-      { name: "Textiles", href: "/products?category=Textile" },
-    ],
-  },
   { name: "Artisans", href: "/artisans" },
   { name: "Workshops", href: "/workshops" },
   {
@@ -93,34 +83,42 @@ export function Navigation() {
 
           {/* Action Buttons */}
           <div className="flex items-center space-x-4">
-            {/* AI Assistant Button */}
-            <Button variant="ghost" size="sm" className="hidden sm:flex">
-              <Volume2 className="h-4 w-4 mr-2" />
-              AI Assistant
-            </Button>
+            {/* AI Assistant Button removed as requested */}
 
             {/* Search */}
-            <Button variant="ghost" size="sm">
-              <Search className="h-4 w-4" />
-              <span className="sr-only">Search</span>
-            </Button>
+            <Link href="/search">
+              <Button asChild variant="ghost" size="sm">
+                <span className="inline-flex items-center">
+                  <Search className="h-4 w-4" />
+                  <span className="sr-only">Search</span>
+                </span>
+              </Button>
+            </Link>
 
             {/* Learning Resources */}
-            <Button variant="ghost" size="sm" className="hidden sm:flex">
-              <BookOpen className="h-4 w-4 mr-2" />
-              Learn
-            </Button>
+            <Link href="/learning" className="hidden sm:flex">
+              <Button asChild variant="ghost" size="sm">
+                <span className="inline-flex items-center">
+                  <BookOpen className="h-4 w-4 mr-2" />Learn
+                </span>
+              </Button>
+            </Link>
 
             {/* Artisan Stories */}
-            <Button variant="ghost" size="sm" className="hidden sm:flex">
-              <Users className="h-4 w-4 mr-2" />
-              Stories
-            </Button>
+            <Link href="/blog" className="hidden sm:flex">
+              <Button asChild variant="ghost" size="sm">
+                <span className="inline-flex items-center">
+                  <Users className="h-4 w-4 mr-2" />Stories
+                </span>
+              </Button>
+            </Link>
 
             {/* CTA Button */}
-            <Button size="sm" className="hidden sm:flex bg-primary hover:bg-primary/90">
-              Explore Heritage
-            </Button>
+            <Link href="/heritage" className="hidden sm:flex">
+              <Button asChild size="sm" className="bg-primary hover:bg-primary/90">
+                <span>Explore Heritage</span>
+              </Button>
+            </Link>
 
             {/* Mobile Menu */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -169,13 +167,9 @@ export function Navigation() {
                 </div>
 
                 <div className="mt-8 pt-8 border-t border-border space-y-4">
-                  <Button className="w-full bg-primary hover:bg-primary/90">
-                    <Volume2 className="h-4 w-4 mr-2" />
-                    AI Assistant
-                  </Button>
-                  <Button variant="outline" className="w-full bg-transparent">
-                    Explore Heritage
-                  </Button>
+                  <Link href="/heritage" onClick={() => setIsOpen(false)}>
+                    <Button className="w-full bg-primary hover:bg-primary/90">Explore Heritage</Button>
+                  </Link>
                 </div>
               </SheetContent>
             </Sheet>

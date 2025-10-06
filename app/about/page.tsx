@@ -23,12 +23,12 @@ export default function AboutPage() {
                 supporting local communities.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="bg-primary hover:bg-primary/90">
-                  Explore Our Heritage
-                </Button>
-                <Button size="lg" variant="outline">
-                  Meet Our Team
-                </Button>
+                <Link href="/heritage">
+                  <Button size="lg" className="bg-primary hover:bg-primary/90">Explore Our Heritage</Button>
+                </Link>
+                <Link href="/artisans">
+                  <Button size="lg" variant="outline">Meet Our Team</Button>
+                </Link>
               </div>
             </div>
             <div className="relative">

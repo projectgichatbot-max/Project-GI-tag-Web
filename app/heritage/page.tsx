@@ -19,6 +19,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import Link from "next/link"
 
 export default function HeritagePage() {
   return (
@@ -458,6 +459,16 @@ export default function HeritagePage() {
             Every product you explore and learn about helps preserve these ancient traditions and supports cultural heritage
             communities who keep them alive.
           </p>
+          <div className="mb-10">
+            <div className="inline-block bg-primary/10 border border-primary/20 rounded-lg p-4 text-left">
+              <p className="font-semibold">Uttarakhand currently has 27 registered GI Tags.</p>
+              <p className="text-sm text-muted-foreground">Source: DPIIT GI Registry (Government of India).</p>
+              <div className="mt-2 flex gap-3 text-sm">
+                <Link className="underline" href="https://search.ipindia.gov.in/GIRPublic/" target="_blank">GI Registry Search</Link>
+                <Link className="underline" href="https://dpiit.gov.in/gi" target="_blank">DPIIT GI Portal</Link>
+              </div>
+            </div>
+          </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/products">
               <Button size="lg" className="bg-primary hover:bg-primary/90">

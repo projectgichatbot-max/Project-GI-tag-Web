@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { Badge } from "../../components/ui/badge"
@@ -119,6 +119,23 @@ export default function LearningPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
           />
+        </div>
+
+        {/* Global search shortcut using backend */}
+        <div className="mb-10">
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="Search the entire site (products, artisans, heritage)"
+              onKeyDown={async (e) => {
+                const target = e.target as HTMLInputElement
+                if (e.key === 'Enter' && target.value.trim()) {
+                  const res = await fetch(`/api/search?q=${encodeURIComponent(target.value)}&type=all&limit=50`)
+                  console.log('Search total:', (await res.json()).total)
+                }
+              }}
+            />
+            <Link href="/search"><Button variant="outline">Open Search</Button></Link>
+          </div>
         </div>
 
         {/* Learning Items */}

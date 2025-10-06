@@ -82,6 +82,17 @@ async function processAIMessage(message: string, db: any): Promise<string> {
   if (lowerMessage.includes('culture') || lowerMessage.includes('tradition') || lowerMessage.includes('heritage')) {
     return "Our products are deeply rooted in Uttarakhand's culture:\n\n• Munsiyari Rajma: Sacred food offered in temples, traditional festival staple\n• Aipan Art: Sacred geometric patterns for spiritual protection and prosperity\n• Each product carries stories of generations and cultural practices\n\nThese products connect you to centuries of tradition and wisdom. What aspect of the culture interests you most?"
   }
+ 
+  // Handle GI Tag count / references for Uttarakhand
+  if (lowerMessage.includes('gi tag') || lowerMessage.includes('gi-tag') || lowerMessage.includes('geographical indication')) {
+    const mentionsCount = lowerMessage.includes('how many') || lowerMessage.includes('total') || lowerMessage.includes('count')
+    const countLine = `As of now, Uttarakhand has 27 registered GI tags.`
+    const refs = `References:\n• DPIIT GI Registry (IP India): https://search.ipindia.gov.in/GIRPublic/\n• DPIIT GI Official Portal: https://dpiit.gov.in/gi` 
+    if (mentionsCount) {
+      return `${countLine}\n\n${refs}\n\nYou can ask me about any specific GI product to learn more.`
+    }
+    return `Geographical Indications (GI) protect traditional products and their origin. Uttarakhand currently has 27 registered GI tags.\n\n${refs}\n\nWhich product would you like to explore?`
+  }
   
   // Handle search queries
   if (lowerMessage.includes('search') || lowerMessage.includes('find') || lowerMessage.includes('look for')) {
@@ -109,6 +120,24 @@ async function processAIMessage(message: string, db: any): Promise<string> {
     return "I can help you with:\n\n• Learn about heritage products and their benefits\n• Connect with traditional artisans\n• Understand cultural significance\n• Find health benefits of traditional foods\n• Search for specific products or artisans\n• Answer questions about Uttarakhand's heritage\n\nJust ask me anything about our products, artisans, or cultural heritage!"
   }
   
-  // Default response
-  return "I'm here to help you learn about Uttarakhand's rich cultural heritage! You can ask me about:\n\n• Traditional products and their health benefits\n• Artisans and their crafts\n• Cultural significance and traditions\n• Workshops and learning opportunities\n\nWhat would you like to know?"
+  // Fallback: try semantic search for anything not matched above
+  try {
+    const results = await db.search(message, 'all', 5)
+    if ((results.products && results.products.length) || (results.artisans && results.artisans.length)) {
+      let out = "Here are relevant results I found:\n\n"
+      if (results.products?.length) {
+        out += "Products:\n" + results.products.map((p: any) => `• ${p.name} (${p.category}) — ${p.region || ''}\n  /products/${p._id || p.id || ''}`).join('\n') + "\n\n"
+      }
+      if (results.artisans?.length) {
+        out += "Artisans:\n" + results.artisans.map((a: any) => `• ${a.name} — ${a.specialization || ''} ${a.village ? 'from ' + a.village : ''}\n  /artisans/${a._id || a.id || ''}`).join('\n')
+      }
+      out += "\n\nAsk me for details on any item above."
+      return out
+    }
+  } catch (e) {
+    console.error('Fallback search failed', e)
+  }
+
+  // Final default
+  return "I'm here to help you learn about Uttarakhand's rich cultural heritage. Ask about a product (e.g., 'Munsiyari Rajma benefits'), an artisan (e.g., 'Ringaal artisan'), or say 'GI tags of Uttarakhand'."
 }
