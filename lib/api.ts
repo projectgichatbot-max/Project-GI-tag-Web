@@ -1,4 +1,4 @@
-// API utility functions for frontend components
+
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || ''
 

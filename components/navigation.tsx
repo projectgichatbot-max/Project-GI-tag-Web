@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 import { Mountain, Search, Menu, ChevronDown, Volume2, BookOpen, Users } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -128,7 +128,13 @@ export function Navigation() {
                   <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-80">
+              <SheetContent
+                side="right"
+                className="w-80 h-full bg-background p-6"
+                aria-label="Mobile navigation"
+              >
+                <SheetTitle className="sr-only">Mobile navigation</SheetTitle>
+                <SheetDescription className="sr-only">Primary website links</SheetDescription>
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center space-x-2">
                     <Mountain className="h-6 w-6 text-primary" />
