@@ -289,7 +289,7 @@ export function Navigation() {
 
             {/* CTA Button */}
             <Link href="/heritage" className="hidden sm:flex">
-              <Button asChild size="sm" className="bg-black text-white hover:bg-blue-500 hover:text-black whitespace-nowrap">
+              <Button asChild size="sm" className="bg-white text-black hover:bg-blue-500 hover:text-black whitespace-nowrap">
                 <span>Explore Heritage</span>
               </Button>
             </Link>
