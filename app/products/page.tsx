@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -15,59 +15,142 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    totalItems: 0,
-    itemsPerPage: 10,
-    hasNextPage: false,
-    hasPrevPage: false
-  })
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalItems, setTotalItems] = useState(0)
+  const [hasNextPage, setHasNextPage] = useState(false)
+  const [hasPrevPage, setHasPrevPage] = useState(false)
   
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("All")
-  const [selectedRegion, setSelectedRegion] = useState("All Regions")
-  const [sortBy, setSortBy] = useState("Featured")
+  const [selectedRegion, setSelectedRegion] = useState("All")
+  const [giCertified, setGiCertified] = useState<boolean | null>(null)
+  const [sortBy, setSortBy] = useState("newest")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [showFilters, setShowFilters] = useState(false)
+  
+  // Refs to prevent duplicate fetches and track initialization
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const hasInitializedRef = useRef(false)
+  const currentRequestIdRef = useRef(0)
 
+  // Categories based on actual seeded data
   const categories = ["All", "Agricultural", "Handicraft", "Textile"]
+  
+  // Regions based on actual seeded data
   const regions = [
-    "All Regions",
-    "Kumaon Region",
-    "Garhwal",
-    "Pithoragarh District",
-    "Uttarkashi",
-    "Garhwal Himalayas",
-    "Mid-hills",
-    "Hill regions",
+    "All",
+    "Almora",
+    "Almora, Bageshwar, Chamoli",
+    "Almora, Chamoli",
+    "Bageshwar, Almora",
+    "Chamoli",
+    "Chamoli, Pithoragarh",
+    "Chamoli, Tehri",
+    "Chamoli, Uttarakhand",
+    "Chamoli, Uttarkashi",
+    "Dehradun, Haridwar, Udham Singh Nagar",
+    "Garhwal region",
+    "Kumaon",
+    "Kumaon & Garhwal",
+    "Kumaon region",
+    "Nainital",
+    "Pauri Garhwal",
+    "Pithoragarh (Berinag)",
+    "Pithoragarh district",
+    "Ramgarh, Nainital",
+    "Ramnagar, Nainital",
+    "Uttarkashi"
   ]
-  const sortOptions = ["Featured", "Cultural Significance", "Health Benefits", "Rating", "Newest"]
+  
+  const sortOptions = [
+    { value: "newest", label: "Newest First" },
+    { value: "rating", label: "Highest Rated" },
+    { value: "name", label: "Name (A-Z)" }
+  ]
 
-  // Fetch products from API
-  const fetchProducts = async () => {
+  // Fetch products from API with proper backend filtering
+  const fetchProducts = async (page: number, requestId: number, signal?: AbortSignal) => {
     try {
+      console.log(`🚀 Starting request #${requestId}`)
       setLoading(true)
       setError(null)
       
-      const response = await productsApi.getAll({
-        page: pagination.currentPage,
-        limit: pagination.itemsPerPage,
-        category: selectedCategory !== 'All' ? selectedCategory : undefined,
-        region: selectedRegion !== 'All Regions' ? selectedRegion : undefined,
-        search: searchQuery || undefined,
+      // Create a unique key for this request
+      const params: any = {
+        page: page,
+        limit: 12,
         available: true
-      })
+      }
+      
+      // Add filters only if they are selected
+      if (selectedCategory !== 'All') {
+        params.category = selectedCategory
+      }
+      
+      if (selectedRegion !== 'All') {
+        params.region = selectedRegion
+      }
+      
+      if (giCertified !== null) {
+        params.giCertified = giCertified
+      }
+      
+      if (searchQuery.trim()) {
+        params.search = searchQuery.trim()
+      }
+      
+      const response = await productsApi.getAll(params)
+      
+      // Check if this request is still the current one
+      if (requestId !== currentRequestIdRef.current) {
+        console.log(`🚫 Request #${requestId} cancelled - newer request exists`)
+        return
+      }
+      
+      // Check if request was aborted
+      if (signal?.aborted) {
+        console.log(`⚠️ Request #${requestId} aborted`)
+        return
+      }
+      
+      console.log(`✅ Request #${requestId} completed successfully`)
       
       if (response.success && response.data) {
-        setProducts(response.data)
+        const sortedProducts = [...response.data]
+        
+        // Apply sorting
+        switch (sortBy) {
+          case "rating":
+            sortedProducts.sort((a: any, b: any) => b.rating - a.rating)
+            break
+          case "name":
+            sortedProducts.sort((a: any, b: any) => a.name.localeCompare(b.name))
+            break
+          case "newest":
+          default:
+            sortedProducts.sort((a: any, b: any) => 
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            )
+            break
+        }
+        
+        setProducts(sortedProducts)
         if (response.pagination) {
-          setPagination(response.pagination)
+          setTotalPages(response.pagination.totalPages)
+          setTotalItems(response.pagination.totalItems)
+          setHasNextPage(response.pagination.hasNextPage)
+          setHasPrevPage(response.pagination.hasPrevPage)
         }
       } else {
         setError(response.error || 'Failed to fetch products')
       }
     } catch (err) {
+      // Ignore abort errors
+      if (err instanceof Error && err.name === 'AbortError') {
+        return
+      }
       setError('Failed to fetch products')
       console.error('Error fetching products:', err)
     } finally {
@@ -75,35 +158,73 @@ export default function ProductsPage() {
     }
   }
 
-  // Load products on component mount and when filters change
+  // SINGLE useEffect to handle ALL data fetching
   useEffect(() => {
-    fetchProducts()
-  }, [searchQuery, selectedCategory, selectedRegion, pagination.currentPage])
-
-  const filteredProducts = useMemo(() => {
-    const filtered = [...products]
-
-    // Sort products based on cultural and educational value
-    switch (sortBy) {
-      case "Cultural Significance":
-        filtered.sort((a, b) => b.rating - a.rating)
-        break
-      case "Health Benefits":
-        filtered.sort((a, b) => b.healthBenefits.length - a.healthBenefits.length)
-        break
-      case "Rating":
-        filtered.sort((a, b) => b.rating - a.rating)
-        break
-      case "Newest":
-        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        break
-      default:
-        // Featured - keep original order
-        break
+    // Clear any existing timeout
+    if (fetchTimeoutRef.current) {
+      clearTimeout(fetchTimeoutRef.current)
+      fetchTimeoutRef.current = null
     }
+    
+    // Cancel any pending requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    
+    // Increment request ID to invalidate previous requests
+    currentRequestIdRef.current += 1
+    const requestId = currentRequestIdRef.current
+    
+    // Create new abort controller
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+    
+    // Determine delay: 500ms for search, 0ms for initial load or filter changes
+    const delay = hasInitializedRef.current && searchQuery ? 500 : 0
+    
+    console.log(`📝 Scheduling request #${requestId} with ${delay}ms delay`)
+    
+    // Schedule fetch
+    fetchTimeoutRef.current = setTimeout(() => {
+      fetchProducts(1, requestId, abortController.signal)
+      setCurrentPage(1)
+      hasInitializedRef.current = true // Mark as initialized after first fetch
+    }, delay)
+    
+    // Cleanup function
+    return () => {
+      if (fetchTimeoutRef.current) {
+        clearTimeout(fetchTimeoutRef.current)
+        fetchTimeoutRef.current = null
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, selectedCategory, selectedRegion, giCertified, sortBy])
 
-    return filtered
-  }, [products, sortBy])
+  // Handle page changes (separate from filter changes)
+  const handlePageChange = (newPage: number) => {
+    // Cancel any pending requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    
+    // Increment request ID
+    currentRequestIdRef.current += 1
+    const requestId = currentRequestIdRef.current
+    
+    // Create new abort controller
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+    
+    setCurrentPage(newPage)
+    fetchProducts(newPage, requestId, abortController.signal)
+  }
+
+  // Remove the local filtering - backend handles it
+  const displayProducts = products
 
   if (loading && products.length === 0) {
     return (
@@ -121,7 +242,13 @@ export default function ProductsPage() {
       <div className="min-h-screen pt-16 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-500 mb-4">{error}</p>
-          <Button onClick={fetchProducts}>Try Again</Button>
+          <Button onClick={() => {
+            currentRequestIdRef.current += 1
+            const requestId = currentRequestIdRef.current
+            const abortController = new AbortController()
+            abortControllerRef.current = abortController
+            fetchProducts(currentPage, requestId, abortController.signal)
+          }}>Try Again</Button>
         </div>
       </div>
     )
@@ -155,8 +282,9 @@ export default function ProductsPage() {
                   onClick={() => {
                     setSearchQuery("")
                     setSelectedCategory("All")
-                    setSelectedRegion("All Regions")
-                    setSortBy("Featured")
+                    setSelectedRegion("All")
+                    setGiCertified(null)
+                    setSortBy("newest")
                   }}
                 >
                   Clear All
@@ -169,7 +297,7 @@ export default function ProductsPage() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search by name, region, or cultural significance..."
+                    placeholder="Search by name, region, or cultural..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -181,10 +309,10 @@ export default function ProductsPage() {
               <div className="mb-6">
                 <label className="text-sm font-medium mb-2 block">Heritage Category</label>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white">
                     {categories.map((category) => (
                       <SelectItem key={category} value={category}>
                         {category}
@@ -198,15 +326,33 @@ export default function ProductsPage() {
               <div className="mb-6">
                 <label className="text-sm font-medium mb-2 block">Cultural Region</label>
                 <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white max-h-[300px]">
                     {regions.map((region) => (
                       <SelectItem key={region} value={region}>
                         {region}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* GI Certified Filter */}
+              <div className="mb-6">
+                <label className="text-sm font-medium mb-2 block">GI Certification</label>
+                <Select 
+                  value={giCertified === null ? "all" : giCertified.toString()} 
+                  onValueChange={(value) => setGiCertified(value === "all" ? null : value === "true")}
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="all">All Products</SelectItem>
+                    <SelectItem value="true">GI Certified Only</SelectItem>
+                    <SelectItem value="false">Non-Certified</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -218,7 +364,7 @@ export default function ProductsPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full justify-start bg-transparent"
+                    className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black"
                     onClick={() => setSelectedCategory("Handicraft")}
                   >
                     Traditional Handicrafts
@@ -226,7 +372,7 @@ export default function ProductsPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full justify-start bg-transparent"
+                    className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black"
                     onClick={() => setSelectedCategory("Agricultural")}
                   >
                     Heritage Food Products
@@ -234,7 +380,7 @@ export default function ProductsPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full justify-start bg-transparent"
+                    className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black"
                     onClick={() => setSelectedCategory("Textile")}
                   >
                     Traditional Textiles
@@ -253,19 +399,21 @@ export default function ProductsPage() {
                   <SlidersHorizontal className="h-4 w-4 mr-2" />
                   Filters
                 </Button>
-                <p className="text-muted-foreground">{pagination.totalItems} heritage products found</p>
+                <p className="text-muted-foreground">
+                  {totalItems} heritage product{totalItems !== 1 ? "s" : ""} found
+                </p>
               </div>
 
               <div className="flex items-center gap-4">
                 {/* Sort */}
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue />
+                  <SelectTrigger className="w-48 bg-white">
+                    <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white">
                     {sortOptions.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {option}
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -299,9 +447,13 @@ export default function ProductsPage() {
                 <Loader2 className="h-6 w-6 animate-spin mr-2" />
                 <span>Loading products...</span>
               </div>
+            ) : displayProducts.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">No products found matching your filters.</p>
+              </div>
             ) : viewMode === "grid" ? (
               <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredProducts.map((product) => (
+                {displayProducts.map((product) => (
                   <Card key={product._id} className="group hover:shadow-lg transition-all duration-300 border-0">
                     <CardContent className="p-0">
                       <div className="relative h-48 overflow-hidden rounded-t-lg">
@@ -318,11 +470,11 @@ export default function ProductsPage() {
                         </div>
                         <div className="absolute top-2 right-2 flex gap-2">
                           {!product.available && (
-                            <Badge variant="outline" className="text-xs bg-white/90">
+                            <Badge variant="outline" className="text-xs bg-white text-black border-0">
                               Learning Only
                             </Badge>
                           )}
-                          <Button size="sm" variant="ghost" className="bg-white/80 hover:bg-white h-8 w-8 p-0">
+                          <Button size="sm" variant="ghost" className="bg-black/80 text-white hover:bg-blue-500 hover:text-black h-8 w-8 p-0">
                             <Heart className="h-4 w-4" />
                           </Button>
                         </div>
@@ -359,7 +511,7 @@ export default function ProductsPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredProducts.map((product) => (
+                {displayProducts.map((product) => (
                   <Card key={product._id} className="hover:shadow-lg transition-all duration-300">
                     <CardContent className="p-6">
                       <div className="flex gap-6">
@@ -430,7 +582,7 @@ export default function ProductsPage() {
               </div>
             )}
 
-            {filteredProducts.length === 0 && !loading && (
+            {displayProducts.length === 0 && !loading && (
               <div className="text-center py-12">
                 <div className="max-w-md mx-auto">
                   <Filter className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -442,7 +594,8 @@ export default function ProductsPage() {
                     onClick={() => {
                       setSearchQuery("")
                       setSelectedCategory("All")
-                      setSelectedRegion("All Regions")
+                      setSelectedRegion("All")
+                      setGiCertified(null)
                     }}
                   >
                     Clear Filters
@@ -452,22 +605,22 @@ export default function ProductsPage() {
             )}
 
             {/* Pagination */}
-            {pagination.totalPages > 1 && (
+            {totalPages > 1 && (
               <div className="flex justify-center items-center gap-2 mt-8">
                 <Button
                   variant="outline"
-                  onClick={() => setPagination(prev => ({ ...prev, currentPage: prev.currentPage - 1 }))}
-                  disabled={!pagination.hasPrevPage}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={!hasPrevPage}
                 >
                   Previous
                 </Button>
                 <span className="text-sm text-muted-foreground">
-                  Page {pagination.currentPage} of {pagination.totalPages}
+                  Page {currentPage} of {totalPages}
                 </span>
                 <Button
                   variant="outline"
-                  onClick={() => setPagination(prev => ({ ...prev, currentPage: prev.currentPage + 1 }))}
-                  disabled={!pagination.hasNextPage}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={!hasNextPage}
                 >
                   Next
                 </Button>

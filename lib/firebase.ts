@@ -1,32 +1,49 @@
-import { initializeApp, getApps, cert } from 'firebase-admin/app'
-import { getFirestore } from 'firebase-admin/firestore'
+import { initializeApp, getApps, cert, App } from 'firebase-admin/app'
+import { getFirestore, Firestore } from 'firebase-admin/firestore'
 import { getStorage } from 'firebase-admin/storage'
 
 // Initialize Firebase Admin
-const firebaseConfig = {
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-}
+let app: App | undefined
+let db: Firestore | null = null
+let storage: ReturnType<typeof getStorage> | null = null
 
-// Initialize Firebase Admin SDK
-let app
-if (getApps().length === 0) {
-  try {
-    app = initializeApp({
-      credential: cert(firebaseConfig),
-      storageBucket: `${process.env.FIREBASE_PROJECT_ID}.appspot.com`,
-    })
-  } catch (error) {
-    console.warn('Firebase Admin initialization failed:', error)
+function initializeFirebase() {
+  if (getApps().length > 0) {
+    app = getApps()[0]
+    db = getFirestore(app)
+    storage = getStorage(app)
+    return true
   }
-} else {
-  app = getApps()[0]
+
+  const firebaseConfig = {
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  }
+
+  try {
+    // Only initialize if all required config is present
+    if (firebaseConfig.projectId && firebaseConfig.privateKey && firebaseConfig.clientEmail) {
+      app = initializeApp({
+        credential: cert(firebaseConfig),
+        storageBucket: `${process.env.FIREBASE_PROJECT_ID}.appspot.com`,
+      })
+      db = getFirestore(app)
+      storage = getStorage(app)
+      console.log('✅ Firebase Admin initialized')
+      return true
+    } else {
+      console.warn('⚠️ Firebase credentials not fully configured. Skipping Firebase initialization.')
+      return false
+    }
+  } catch (error: any) {
+    console.warn('⚠️ Firebase Admin initialization failed (this is okay if using MongoDB):', error.message)
+    return false
+  }
 }
 
-// Get Firestore and Storage instances
-export const db = app ? getFirestore(app) : null
-export const storage = app ? getStorage(app) : null
+// Export initialization function
+export { initializeFirebase, db, storage }
 
 // Firebase collections
 export const COLLECTIONS = {
@@ -35,7 +52,8 @@ export const COLLECTIONS = {
   USERS: 'users',
   INQUIRIES: 'inquiries',
   REVIEWS: 'reviews',
-  WORKSHOPS: 'workshops'
+  WORKSHOPS: 'workshops',
+  NEWSLETTER: 'newsletter'
 } as const
 
 // Firebase helper functions

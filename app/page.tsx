@@ -1,3 +1,6 @@
+"use client"
+
+import { useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -6,27 +9,67 @@ import Image from "next/image"
 import Link from "next/link"
 
 export default function HomePage() {
+  const typedRef = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    let typedInstance: any = null
+    
+    if (typedRef.current) {
+      // Dynamically import typed.js to avoid SSR issues
+      import("typed.js").then((TypedModule) => {
+        // Handle both ES module and CommonJS exports
+        const Typed = (TypedModule as any).default || TypedModule
+        typedInstance = new Typed(typedRef.current!, {
+          strings: [
+            "GI-Tagged Products<br>of Uttarakhand",
+            "Authentic Handicrafts<br>of Uttarakhand",
+            "Organic Foods<br>of Uttarakhand"
+          ],
+          typeSpeed: 80,
+          backSpeed: 50,
+          backDelay: 2000,
+          startDelay: 500,
+          loop: true,
+          showCursor: true,
+          cursorChar: "|",
+          smartBackspace: false,
+        })
+      }).catch((err) => {
+        console.error("Failed to load typed.js:", err)
+      })
+    }
+
+    return () => {
+      if (typedInstance) {
+        typedInstance.destroy()
+      }
+    }
+  }, [])
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
-          <Image
-            src="/uttarakhand-mountains-landscape-sunrise-golden-hou.jpg"
-            alt="Uttarakhand Mountains"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 hero-gradient" />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            <source src="/uk-heritage.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 hero-gradient bg-black/20" />
         </div>
 
         <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
-          <Badge className="mb-6 bg-accent/20 text-white border-white/20">Land of the Gods</Badge>
+          <Badge className="mb-6 bg-black text-white border-0">Land of the Gods</Badge>
           <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 text-balance">
-            Discover Authentic
-            <span className="block text-accent">GI-Tagged Products</span>
-            of Uttarakhand
+            <span className="block text-accent">
+              <span ref={typedRef}></span>
+            </span>
+            
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-2xl mx-auto text-pretty">
             Explore traditional handicrafts, organic foods, and cultural treasures that preserve the rich heritage of
@@ -34,7 +77,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/heritage">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-white">
+              <Button size="lg" className="bg-black text-white hover:bg-blue-500 hover:text-black transition-all duration-300">
                 Explore Heritage
                 <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
@@ -42,8 +85,7 @@ export default function HomePage() {
             <Link href="/artisans">
               <Button
                 size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-primary bg-transparent"
+                className="bg-black text-white hover:bg-blue-500 hover:text-black transition-all duration-300"
               >
                 Meet Artisans
               </Button>
@@ -72,7 +114,7 @@ export default function HomePage() {
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                <Badge className="absolute top-4 left-4 bg-primary">Handicrafts</Badge>
+                <Badge className="absolute top-4 left-4 bg-black text-white border-0">Handicrafts</Badge>
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-serif font-semibold mb-2">Handicrafts & Handlooms</h3>
@@ -97,7 +139,7 @@ export default function HomePage() {
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                <Badge className="absolute top-4 left-4 bg-secondary">Organic Foods</Badge>
+                <Badge className="absolute top-4 left-4 bg-black text-white border-0">Organic Foods</Badge>
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-serif font-semibold mb-2">Agricultural Products</h3>
@@ -122,7 +164,7 @@ export default function HomePage() {
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                <Badge className="absolute top-4 left-4 bg-accent">Textiles</Badge>
+                <Badge className="absolute top-4 left-4 bg-black text-white border-0">Textiles</Badge>
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-serif font-semibold mb-2">Apparel & Wool Products</h3>
@@ -144,7 +186,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <Badge className="mb-4 bg-primary/10 text-primary">Cultural Preservation</Badge>
+              <Badge className="mb-4 bg-black text-white border-0">Cultural Preservation</Badge>
               <h2 className="text-4xl font-serif font-bold mb-6 text-balance">Why GI-Tagged Products Matter</h2>
               <p className="text-lg text-muted-foreground mb-8 text-pretty">
                 Geographical Indication (GI) tags protect and promote regional identity, ensuring product quality while
@@ -252,7 +294,7 @@ export default function HomePage() {
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <Button size="sm" variant="ghost" className="absolute top-2 right-2 bg-white/80 hover:bg-white">
+                  <Button size="sm" variant="ghost" className="absolute top-2 right-2 bg-black/80 text-white hover:bg-blue-500 hover:text-black">
                     <Heart className="h-4 w-4" />
                   </Button>
                 </div>
@@ -282,7 +324,7 @@ export default function HomePage() {
 
         <div className="text-center mt-12">
           <Link href="/heritage">
-            <Button size="lg" className="bg-primary hover:bg-primary/90">
+            <Button size="lg" className="bg-black text-white hover:bg-blue-500 hover:text-black">
               Explore More Heritage
               <ChevronRight className="ml-2 h-5 w-5" />
             </Button>

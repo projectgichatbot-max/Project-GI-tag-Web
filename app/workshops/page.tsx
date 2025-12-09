@@ -212,7 +212,7 @@ export default function WorkshopsPage() {
                   <Button 
                     size="sm" 
                     variant="ghost" 
-                    className="absolute top-2 left-2 bg-white/80 hover:bg-white h-8 w-8 p-0"
+                    className="absolute top-2 left-2 bg-white hover:bg-gray-100 h-8 w-8 p-0"
                   >
                     <Heart className="h-4 w-4" />
                   </Button>

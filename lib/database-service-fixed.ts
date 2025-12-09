@@ -1,5 +1,5 @@
 import connectDB from './database'
-import { FirebaseService, COLLECTIONS } from './firebase'
+import { FirebaseService, COLLECTIONS, initializeFirebase } from './firebase'
 
 export interface DatabaseService {
   // Products
@@ -29,6 +29,14 @@ export interface DatabaseService {
   createInquiry(data: any): Promise<any>
   updateInquiry(id: string, data: any): Promise<any>
   deleteInquiry(id: string): Promise<any>
+  
+  // Newsletter
+  getNewsletterSubscribers(filters?: any, pagination?: any): Promise<any>
+  getNewsletterSubscriberById(id: string): Promise<any>
+  createNewsletterSubscriber(data: any): Promise<any>
+  updateNewsletterSubscriber(id: string, data: any): Promise<any>
+  deleteNewsletterSubscriber(id: string): Promise<any>
+  unsubscribeNewsletter(email: string): Promise<any>
   
   // Search
   search(query: string, type?: string, limit?: number): Promise<any>
@@ -221,6 +229,95 @@ class MongoDBService implements DatabaseService {
   async deleteInquiry(id: string) {
     const { Inquiry } = await import('./models/Inquiry')
     return await Inquiry.findByIdAndDelete(id)
+  }
+
+  // Newsletter methods
+  async getNewsletterSubscribers(filters: any = {}, pagination: any = {}) {
+    const { Newsletter } = await import('./models/Newsletter')
+    const { page = 1, limit = 10 } = pagination
+    const skip = (page - 1) * limit
+    
+    const subscribers = await Newsletter.find(filters)
+      .sort({ subscribedAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+    
+    const total = await Newsletter.countDocuments(filters)
+    
+    return {
+      data: subscribers,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        itemsPerPage: limit,
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1
+      }
+    }
+  }
+
+  async getNewsletterSubscriberById(id: string) {
+    const { Newsletter } = await import('./models/Newsletter')
+    return await Newsletter.findById(id).lean()
+  }
+
+  async createNewsletterSubscriber(data: any) {
+    const { Newsletter } = await import('./models/Newsletter')
+    
+    // Check if email already exists
+    const existing = await Newsletter.findOne({ email: data.email.toLowerCase() })
+    if (existing) {
+      // If unsubscribed, reactivate
+      if (existing.status === 'unsubscribed') {
+        return await Newsletter.findByIdAndUpdate(
+          existing._id,
+          { 
+            status: 'active',
+            subscribedAt: new Date(),
+            unsubscribedAt: undefined,
+            updatedAt: new Date()
+          },
+          { new: true }
+        )
+      }
+      // If already active, return existing
+      return existing
+    }
+    
+    const subscriber = new Newsletter({
+      ...data,
+      email: data.email.toLowerCase(),
+      subscribedAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    })
+    
+    return await subscriber.save()
+  }
+
+  async updateNewsletterSubscriber(id: string, data: any) {
+    const { Newsletter } = await import('./models/Newsletter')
+    return await Newsletter.findByIdAndUpdate(id, { ...data, updatedAt: new Date() }, { new: true })
+  }
+
+  async deleteNewsletterSubscriber(id: string) {
+    const { Newsletter } = await import('./models/Newsletter')
+    return await Newsletter.findByIdAndDelete(id)
+  }
+
+  async unsubscribeNewsletter(email: string) {
+    const { Newsletter } = await import('./models/Newsletter')
+    return await Newsletter.findOneAndUpdate(
+      { email: email.toLowerCase() },
+      { 
+        status: 'unsubscribed',
+        unsubscribedAt: new Date(),
+        updatedAt: new Date()
+      },
+      { new: true }
+    )
   }
 
   async search(query: string, type?: string, limit: number = 10) {
@@ -495,6 +592,87 @@ class FirebaseDatabaseService implements DatabaseService {
     return { success: true, id }
   }
 
+  // Newsletter methods
+  async getNewsletterSubscribers(filters: any = {}, pagination: any = {}) {
+    const { page = 1, limit = 10 } = pagination
+    const subscribers = await FirebaseService.getDocuments(
+      COLLECTIONS.NEWSLETTER,
+      filters.status ? [{ field: 'status', operator: '==', value: filters.status }] : undefined,
+      limit,
+      { field: 'createdAt', direction: 'desc' }
+    )
+    
+    return {
+      data: subscribers,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(subscribers.length / limit),
+        totalItems: subscribers.length,
+        itemsPerPage: limit,
+        hasNextPage: subscribers.length === limit,
+        hasPrevPage: page > 1
+      }
+    }
+  }
+
+  async getNewsletterSubscriberById(id: string) {
+    return await FirebaseService.getDocument(COLLECTIONS.NEWSLETTER, id)
+  }
+
+  async createNewsletterSubscriber(data: any) {
+    // Check if email already exists
+    const existing = await FirebaseService.getDocuments(
+      COLLECTIONS.NEWSLETTER,
+      [{ field: 'email', operator: '==', value: data.email.toLowerCase() }]
+    )
+    
+    if (existing && existing.length > 0) {
+      throw new Error('Email already subscribed')
+    }
+    
+    const subscriberData = {
+      email: data.email.toLowerCase(),
+      status: 'active',
+      source: data.source || 'footer',
+      subscribedAt: new Date().toISOString(),
+      metadata: data.metadata || {},
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+    
+    return await FirebaseService.createDocument(COLLECTIONS.NEWSLETTER, subscriberData)
+  }
+
+  async updateNewsletterSubscriber(id: string, data: any) {
+    return await FirebaseService.updateDocument(COLLECTIONS.NEWSLETTER, id, {
+      ...data,
+      updatedAt: new Date().toISOString()
+    })
+  }
+
+  async deleteNewsletterSubscriber(id: string) {
+    await FirebaseService.deleteDocument(COLLECTIONS.NEWSLETTER, id)
+    return { success: true, id }
+  }
+
+  async unsubscribeNewsletter(email: string) {
+    const subscribers = await FirebaseService.getDocuments(
+      COLLECTIONS.NEWSLETTER,
+      [{ field: 'email', operator: '==', value: email.toLowerCase() }]
+    )
+    
+    if (subscribers && subscribers.length > 0) {
+      const subscriber = subscribers[0]
+      return await FirebaseService.updateDocument(COLLECTIONS.NEWSLETTER, subscriber.id, {
+        status: 'unsubscribed',
+        unsubscribedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      })
+    }
+    
+    throw new Error('Email not found')
+  }
+
   async search(query: string, type?: string, limit: number = 10) {
     return {
       products: [],
@@ -513,8 +691,11 @@ export async function getDatabaseService(): Promise<DatabaseService> {
       return new MongoDBService()
     }
   } catch (error) {
-    console.log('📊 MongoDB not available, using Firebase')
+    console.log('📊 MongoDB not available, attempting Firebase')
   }
+  
+  // Initialize Firebase before using it
+  initializeFirebase()
   
   console.log('📊 Using Firebase as primary database')
   return new FirebaseDatabaseService()

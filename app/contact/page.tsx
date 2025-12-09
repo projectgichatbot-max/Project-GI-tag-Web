@@ -11,7 +11,7 @@ export default function ContactPage() {
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-primary/10 text-primary">Get in Touch</Badge>
+          <Badge className="mb-4 bg-black text-white border-0">Get in Touch</Badge>
           <h1 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-balance">Contact Us</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
             Have questions about our GI-tagged products, need support, or want to connect with artisans? We're here to
@@ -87,7 +87,7 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                <Button className="w-full bg-primary hover:bg-primary/90">
+                <Button className="w-full bg-black text-white hover:bg-blue-500 hover:text-black">
                   Send Message
                   <MessageSquare className="ml-2 h-4 w-4" />
                 </Button>

@@ -68,7 +68,7 @@ export default function BlogPostPage({ params }: any) {
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center text-white">
-              <Badge className="mb-4 bg-amber-600 hover:bg-amber-700 text-white border-transparent">{post.category}</Badge>
+              <Badge className="mb-4 bg-black text-white border-0">{post.category}</Badge>
               <h1 className="text-3xl md:text-5xl font-bold mb-4 text-balance">{post.title}</h1>
               <div className="flex items-center justify-center gap-6 text-amber-100">
                 <div className="flex items-center gap-2">
@@ -94,7 +94,7 @@ export default function BlogPostPage({ params }: any) {
           {/* Navigation */}
           <div className="mb-8">
             <Link href="/blog">
-              <Button className="group bg-transparent border border-input hover:bg-accent hover:text-accent-foreground">
+              <Button className="group bg-black text-white hover:bg-blue-500 hover:text-black border border-input">
                 <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
                 Back to Blog
               </Button>

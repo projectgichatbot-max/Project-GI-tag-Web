@@ -273,7 +273,7 @@ export default function ArtisansPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full justify-start bg-transparent"
+                    className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black"
                     onClick={() => setSortBy("Featured")}
                   >
                     Featured Artisans
@@ -281,7 +281,7 @@ export default function ArtisansPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full justify-start bg-transparent"
+                    className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black"
                     onClick={() => setSelectedCraft("Aipan Art")}
                   >
                     Traditional Artists
@@ -289,7 +289,7 @@ export default function ArtisansPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full justify-start bg-transparent"
+                    className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black"
                     onClick={() => setSelectedCraft("Organic Farming")}
                   >
                     Organic Farmers
@@ -374,7 +374,7 @@ export default function ArtisansPage() {
                             <h3 className="font-semibold truncate">{artisan.name}</h3>
                             <p className="text-sm text-muted-foreground truncate">{artisan.craft}</p>
                           </div>
-                          <Badge className="bg-primary/10 text-primary">Featured</Badge>
+                          <Badge className="bg-black text-white border-0">Featured</Badge>
                         </div>
                       </CardContent>
                     </Card>
@@ -401,8 +401,8 @@ export default function ArtisansPage() {
                           </Badge>
                         </div>
                         <div className="absolute top-2 right-2 flex gap-2">
-                          {artisan.featured && <Badge className="bg-primary text-xs">Featured</Badge>}
-                          <Button size="sm" variant="ghost" className="bg-white/80 hover:bg-white h-8 w-8 p-0">
+                          {artisan.featured && <Badge className="bg-black text-white text-xs border-0">Featured</Badge>}
+                          <Button size="sm" variant="ghost" className="bg-black/80 text-white hover:bg-blue-500 hover:text-black h-8 w-8 p-0">
                             <Heart className="h-4 w-4" />
                           </Button>
                         </div>
@@ -458,7 +458,7 @@ export default function ArtisansPage() {
                                 <Badge variant="secondary" className="text-xs">
                                   {artisan.craft}
                                 </Badge>
-                                {artisan.featured && <Badge className="bg-primary text-xs">Featured</Badge>}
+                                {artisan.featured && <Badge className="bg-black text-white text-xs border-0">Featured</Badge>}
                               </div>
                               <div className="flex items-center text-sm text-muted-foreground mb-1">
                                 <MapPin className="h-3 w-3 mr-1" />

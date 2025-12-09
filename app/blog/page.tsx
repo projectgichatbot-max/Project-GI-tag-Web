@@ -149,7 +149,7 @@ export default function BlogPage() {
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-4 left-4">
-                      <Badge className="bg-amber-600 hover:bg-amber-700">{post.category}</Badge>
+                      <Badge className="bg-black text-white border-0">{post.category}</Badge>
                     </div>
                   </div>
                   <CardContent className="p-6">
@@ -171,7 +171,7 @@ export default function BlogPage() {
                     <p className="text-muted-foreground mb-4 text-pretty">{post.excerpt}</p>
                     <div className="flex items-center justify-between">
                       <Link href={`/blog/${post.id}`}>
-                        <Button variant="outline" className="group bg-transparent">
+                        <Button variant="outline" className="group bg-black text-white hover:bg-blue-500 hover:text-black">
                           Read More
                           <BookOpen className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                         </Button>

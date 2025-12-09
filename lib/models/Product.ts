@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose'
+import mongoose, { Schema, model, Document } from 'mongoose'
 
 export interface IProduct extends Document {
   name: string
@@ -119,4 +119,4 @@ ProductSchema.index({ region: 1 })
 ProductSchema.index({ giCertified: 1 })
 ProductSchema.index({ available: 1 })
 
-export const Product = model<IProduct>('Product', ProductSchema)
+export const Product = mongoose.models.Product || model<IProduct>('Product', ProductSchema)

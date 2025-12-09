@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose'
+import mongoose, { Schema, model, Document } from 'mongoose'
 
 export interface IUser extends Document {
   name: string
@@ -104,9 +104,8 @@ const UserSchema = new Schema<IUser>({
   timestamps: true
 })
 
-// Indexes for better performance
-UserSchema.index({ email: 1 })
+// Indexes for better performance - email index is already set by unique: true
 UserSchema.index({ 'preferences.interests': 1 })
 UserSchema.index({ 'learningProgress.level': 1 })
 
-export const User = model<IUser>('User', UserSchema)
+export const User = mongoose.models.User || model<IUser>('User', UserSchema)

@@ -1,12 +1,5 @@
 import mongoose from 'mongoose'
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/uttarakhand_gi_products'
-
-// Check if MongoDB URI is provided
-if (!MONGODB_URI) {
-  console.warn('MONGODB_URI not found. Using Firebase as primary database.')
-}
-
 /**
  * Global is used here to maintain a cached connection across hot reloads
  * in development. This prevents connections growing exponentially
@@ -25,8 +18,12 @@ if (!cached) {
 }
 
 async function connectDB() {
-  // If MongoDB URI is not provided, skip MongoDB connection
-  if (!MONGODB_URI || MONGODB_URI === 'mongodb://localhost:27017/uttarakhand_gi_products') {
+  // Get MongoDB URI at runtime, not at module load time
+  const MONGODB_URI = process.env.MONGODB_URI
+  const defaultLocalhost = 'mongodb://localhost:27017/uttarakhand_gi_products'
+  
+  // If MongoDB URI is not provided or is default localhost, skip MongoDB connection
+  if (!MONGODB_URI || MONGODB_URI === defaultLocalhost) {
     console.log('⚠️ MongoDB URI not configured. Using Firebase as primary database.')
     return null
   }
@@ -47,7 +44,7 @@ async function connectDB() {
         return m
       })
       .catch((error) => {
-        console.error('❌ MongoDB connection error:', error)
+        console.error('❌ MongoDB connection error:', error.message)
         console.log('🔄 Falling back to Firebase database')
         // Re-throw so outer await catch sets promise null and returns fallback
         throw error

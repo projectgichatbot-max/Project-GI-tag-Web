@@ -28,10 +28,6 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date()
     })
 
-    // In production, you would:
-    // 1. Send email notification to admin
-    // 2. Send auto-reply to user
-    // 3. Create support ticket in external system
 
     return NextResponse.json({
       success: true,

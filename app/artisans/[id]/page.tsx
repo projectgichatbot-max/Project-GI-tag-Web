@@ -144,7 +144,7 @@ export default function ArtisanProfilePage() {
               <div className="flex-1 text-center md:text-left">
                 <div className="flex flex-col md:flex-row md:items-center gap-2 mb-3">
                   <h1 className="text-3xl font-serif font-bold">{artisan.name}</h1>
-                  <Badge className="bg-primary/10 text-primary w-fit mx-auto md:mx-0">Master Artisan</Badge>
+                  <Badge className="bg-black text-white border-0 w-fit mx-auto md:mx-0">Master Artisan</Badge>
                 </div>
                 <div className="flex items-center justify-center md:justify-start text-muted-foreground mb-2">
                   <MapPin className="h-4 w-4 mr-1" />
@@ -164,7 +164,7 @@ export default function ArtisanProfilePage() {
                 </div>
                 <p className="text-muted-foreground mb-6 text-pretty">{artisan.specialization}</p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-                  <Button className="bg-primary hover:bg-primary/90">
+                  <Button className="bg-black text-white hover:bg-blue-500 hover:text-black">
                     <ShoppingCart className="h-4 w-4 mr-2" />
                     View Products
                   </Button>
@@ -222,7 +222,7 @@ export default function ArtisanProfilePage() {
                     <span className="text-sm">{artisan.contact.email}</span>
                   </div>
                 </div>
-                <Button className="w-full mt-4 bg-transparent border border-input hover:bg-accent hover:text-accent-foreground">
+                <Button className="w-full mt-4 bg-black text-white hover:bg-blue-500 hover:text-black border border-input">
                   Send Message
                 </Button>
               </CardContent>

@@ -5,6 +5,7 @@ import "./globals.css"
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
 import { AIChatbot } from "@/components/ai-chatbot-fixed"
+import { Toaster } from "@/components/ui/sonner"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -41,6 +42,7 @@ export default function RootLayout({
         <main>{children}</main>
         <Footer />
         <AIChatbot />
+        <Toaster />
       </body>
     </html>
   )

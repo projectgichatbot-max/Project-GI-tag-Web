@@ -36,10 +36,12 @@ export default function HeritagePage() {
               Discover the timeless traditions, sacred crafts, and cultural treasures of the "Land of the Gods" - where
               every product tells a story of heritage and devotion.
             </p>
-            <Button size="lg" className="bg-primary hover:bg-primary/90">
-              Explore Our Heritage
-              <ChevronRight className="ml-2 h-5 w-5" />
-            </Button>
+            <Link href="/products">
+              <Button size="lg" className="bg-black text-white hover:bg-blue-500 hover:text-black">
+                Explore Our Heritage
+                <ChevronRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -470,7 +472,7 @@ export default function HeritagePage() {
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/products">
-              <Button size="lg" className="bg-primary hover:bg-primary/90">
+              <Button size="lg" className="bg-black text-white hover:bg-blue-500 hover:text-black">
                 Explore Heritage Products
               </Button>
             </Link>

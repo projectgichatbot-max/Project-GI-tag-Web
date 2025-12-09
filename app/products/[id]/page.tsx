@@ -247,7 +247,7 @@ export default function ProductDetailPage() {
               {product.availabilityNote || "This heritage item is presented for cultural and educational exploration."}
             </div>
 
-            <Button variant="outline" size="lg" className="w-full bg-transparent">
+            <Button variant="outline" size="lg" className="w-full bg-black text-white hover:bg-blue-500 hover:text-black">
               <Volume2 className="h-4 w-4 mr-2" />
               Ask AI Assistant About This Heritage Item
             </Button>

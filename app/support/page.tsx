@@ -83,7 +83,7 @@ export default function SupportPage() {
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-primary/10 text-primary">Support Center</Badge>
+          <Badge className="mb-4 bg-black text-white border-0">Support Center</Badge>
           <h1 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-balance">How Can We Help You?</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
             Find answers to your questions, learn about our products, and get the support you need to explore
@@ -229,7 +229,7 @@ export default function SupportPage() {
                     <div>
                       <h4 className="font-semibold">Phone Support</h4>
                       <p className="text-sm text-muted-foreground">+91 135 XXX XXXX</p>
-                      <Button size="sm" variant="outline" className="mt-2 bg-transparent">
+                      <Button size="sm" variant="outline" className="mt-2 bg-black text-white hover:bg-blue-500 hover:text-black">
                         Call Now
                       </Button>
                     </div>
@@ -240,7 +240,7 @@ export default function SupportPage() {
                     <div>
                       <h4 className="font-semibold">Email Support</h4>
                       <p className="text-sm text-muted-foreground">support@uttarakhandheritage.com</p>
-                      <Button size="sm" variant="outline" className="mt-2 bg-transparent">
+                      <Button size="sm" variant="outline" className="mt-2 bg-black text-white hover:bg-blue-500 hover:text-black">
                         Send Email
                       </Button>
                     </div>
@@ -284,19 +284,19 @@ export default function SupportPage() {
                   <CardTitle className="text-xl font-serif">Downloads</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
+                  <Button variant="outline" className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black">
                     <Download className="mr-2 h-4 w-4" />
                     Product Care Guide (PDF)
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
+                  <Button variant="outline" className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black">
                     <Download className="mr-2 h-4 w-4" />
                     GI Certification Guide
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
+                  <Button variant="outline" className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black">
                     <Download className="mr-2 h-4 w-4" />
                     Artisan Directory
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
+                  <Button variant="outline" className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black">
                     <Download className="mr-2 h-4 w-4" />
                     Cultural Heritage Booklet
                   </Button>
@@ -325,19 +325,19 @@ export default function SupportPage() {
                   <CardTitle className="text-xl font-serif">Community</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
+                  <Button variant="outline" className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black">
                     <ExternalLink className="mr-2 h-4 w-4" />
                     Community Forum
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
+                  <Button variant="outline" className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black">
                     <ExternalLink className="mr-2 h-4 w-4" />
                     Artisan Network
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
+                  <Button variant="outline" className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black">
                     <ExternalLink className="mr-2 h-4 w-4" />
                     Cultural Events
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
+                  <Button variant="outline" className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black">
                     <ExternalLink className="mr-2 h-4 w-4" />
                     Newsletter
                   </Button>

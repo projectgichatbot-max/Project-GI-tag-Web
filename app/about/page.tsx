@@ -13,7 +13,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <Badge className="mb-4 bg-primary/10 text-primary">About Our Mission</Badge>
+              <Badge className="mb-4 bg-black text-white border-0">About Our Mission</Badge>
               <h1 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-balance">
                 Preserving Uttarakhand's Cultural Heritage Through Technology
               </h1>
@@ -24,7 +24,7 @@ export default function AboutPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/heritage">
-                  <Button size="lg" className="bg-primary hover:bg-primary/90">Explore Our Heritage</Button>
+                  <Button size="lg" className="bg-black text-white hover:bg-blue-500 hover:text-black">Explore Our Heritage</Button>
                 </Link>
                 <Link href="/artisans">
                   <Button size="lg" variant="outline">Meet Our Team</Button>
@@ -171,7 +171,7 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">50+</div>
+              <div className="text-4xl font-bold text-primary mb-2">27</div>
               <div className="text-muted-foreground">GI-Tagged Products</div>
             </div>
             <div className="text-center">
@@ -310,7 +310,7 @@ export default function AboutPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/products">
-              <Button size="lg" className="bg-primary hover:bg-primary/90">
+              <Button size="lg" className="bg-black text-white hover:bg-blue-500 hover:text-black">
                 Explore Products
               </Button>
             </Link>

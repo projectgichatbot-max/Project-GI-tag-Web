@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose'
+import mongoose, { Schema, model, Document } from 'mongoose'
 
 export interface IInquiry extends Document {
   name: string
@@ -64,4 +64,4 @@ InquirySchema.index({ priority: 1 })
 InquirySchema.index({ inquiryType: 1 })
 InquirySchema.index({ createdAt: -1 })
 
-export const Inquiry = model<IInquiry>('Inquiry', InquirySchema)
+export const Inquiry = mongoose.models.Inquiry || model<IInquiry>('Inquiry', InquirySchema)

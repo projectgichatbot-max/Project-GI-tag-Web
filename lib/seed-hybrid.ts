@@ -1,5 +1,16 @@
+import { config } from 'dotenv'
+import { resolve } from 'path'
+
+// Load .env.local file explicitly
+config({ path: resolve(process.cwd(), '.env.local') })
+config() // Also load .env if exists
+
 import { getDatabaseService } from './database-service'
-import { FirebaseService } from './firebase'
+import { FirebaseService, initializeFirebase } from './firebase'
+import { allGIProducts } from './gi-products-complete'
+
+// Initialize Firebase after env vars are loaded
+initializeFirebase()
 
 // Sample data for seeding
 const sampleArtisans = [
@@ -126,115 +137,91 @@ const sampleArtisans = [
   }
 ]
 
-const sampleProducts = [
-  {
-    name: "Munsiyari Rajma",
-    category: "Agricultural",
-    region: "Pithoragarh District (Munsiyari)",
-    description: "Small-sized red beans, rich in taste, grown in high-altitude organic conditions",
-    longDescription: "Munsiyari Rajma is a premium variety of kidney beans grown in the high-altitude regions of Pithoragarh district. These small-sized red beans are cultivated using traditional organic farming methods passed down through generations. The unique climatic conditions and soil composition of the Munsiyari region give these beans their distinctive taste and nutritional profile.",
-    healthBenefits: [
-      "Rich in iron & calcium",
-      "High protein content (22g per 100g)",
-      "Diabetic-friendly with low glycemic index",
-      "High fiber content aids digestion",
-      "Rich in folate and magnesium"
-    ],
-    culturalSignificance: "Traditional staple food of Kumaon region, often prepared during festivals and special occasions. The beans are considered sacred and are offered in local temples during harvest festivals.",
-    images: ["/munsiyari-rajma-kidney-beans-red.jpg"],
-    cloudinaryPublicIds: ["uttarakhand-heritage/products/munsiyari-rajma-1"],
-  rating: 4.8,
-  reviewsCount: 124,
-    culturalValue: "Traditional staple food of Kumaon region",
-    available: true,
-    giCertified: true,
-    giRegistrationNumber: "GI-2019-0123",
-    artisan: {
-      id: "rajesh-negi-id",
-      name: "Rajesh Negi",
-      village: "Munsiyari",
-      district: "Pithoragarh",
-      experience: "25+ years",
-      specialization: "Organic farming",
-      contact: "rajesh.negi@example.com",
-      bio: "Rajesh has been practicing organic farming in the high altitudes of Munsiyari for over two decades."
-    },
-    nutritionalInfo: {
-      protein: "22g",
-      carbs: "60g",
-      fiber: "15g",
-      iron: "8.2mg",
-      calcium: "143mg",
-      calories: "333 kcal"
-    },
-    harvestSeason: "September - October",
-    shelfLife: "12 months",
-    storageInstructions: "Store in a cool, dry place away from direct sunlight",
-    cookingInstructions: [
-      "Soak beans overnight in water",
-      "Pressure cook for 15-20 minutes",
-      "Season with traditional spices",
-      "Best served with rice or roti"
-    ],
-    seasonality: "Harvested in September-October",
-  reviews: [],
-    tags: ["organic", "traditional", "healthy", "protein-rich"],
-    keywords: ["rajma", "kidney beans", "protein", "organic", "munsiyari", "health", "traditional"]
-  },
-  {
-    name: "Aipan Art Painting",
-    category: "Handicraft",
-    region: "Kumaon Region",
-    description: "Traditional geometric patterns painted with rice paste, representing cultural heritage",
-    longDescription: "Aipan is a traditional folk art of Kumaon region, characterized by intricate geometric patterns painted with rice paste on red ochre background. This sacred art form is practiced during festivals, ceremonies, and auspicious occasions. Each pattern has deep spiritual significance and represents various aspects of nature and divinity.",
-    healthBenefits: ["Therapeutic art practice", "Stress relief through meditation", "Enhances creativity and focus"],
-    culturalSignificance: "Sacred art form used in festivals and ceremonies, believed to bring prosperity and ward off evil spirits. Traditionally painted by women during Diwali, weddings, and other auspicious occasions.",
-    images: ["/aipan-art-traditional-patterns-geometric.jpg"],
-    cloudinaryPublicIds: ["uttarakhand-heritage/products/aipan-art-1"],
-  rating: 4.9,
-  reviewsCount: 89,
-    culturalValue: "Sacred art form used in festivals and ceremonies",
-    available: true,
-    giCertified: true,
-    giRegistrationNumber: "GI-2020-0456",
-    artisan: {
-      id: "meera-bisht-id",
-      name: "Meera Bisht",
-      village: "Almora",
-      district: "Almora",
-      experience: "30+ years",
-      specialization: "Aipan Art",
-      contact: "meera.bisht@example.com",
-      bio: "Master artist who learned this traditional art from her grandmother and now teaches it to preserve the cultural heritage."
-    },
-    dimensions: '12" x 16"',
-    materials: "Rice paste, natural ochre, handmade paper",
-    careInstructions: "Keep away from moisture and direct sunlight",
-  reviews: [],
-    tags: ["art", "traditional", "cultural", "sacred"],
-    keywords: ["aipan", "art", "geometric", "sacred", "spiritual", "traditional", "patterns"]
+// Use all 27 GI products from the complete list
+// Filter to keep existing ones and add missing ones
+const existingProductNames = ["Munsiyari Rajma", "Aipan Art Painting"]
+const sampleProducts = allGIProducts.map(product => {
+  // Update existing products to match current structure
+  if (product.name === "Munsiyari White Kidney Beans (Rajma)") {
+    return {
+      ...product,
+      name: "Munsiyari Rajma",
+      giRegistrationNumber: "854",
+      artisan: {
+        id: "rajesh-negi-id",
+        name: "Rajesh Negi",
+        village: "Munsiyari",
+        district: "Pithoragarh",
+        experience: "25+ years",
+        specialization: "Organic farming",
+        contact: "rajesh.negi@example.com",
+        bio: "Rajesh has been practicing organic farming in the high altitudes of Munsiyari for over two decades."
+      }
+    }
   }
-]
+  if (product.name === "Aipan Art") {
+    return {
+      ...product,
+      name: "Aipan Art Painting",
+      artisan: {
+        id: "meera-bisht-id",
+        name: "Meera Bisht",
+        village: "Almora",
+        district: "Almora",
+        experience: "30+ years",
+        specialization: "Aipan Art",
+        contact: "meera.bisht@example.com",
+        bio: "Master artist who learned this traditional art from her grandmother and now teaches it to preserve the cultural heritage."
+      }
+    }
+  }
+  return product
+})
 
 export async function seedDatabase() {
   try {
     console.log('🌱 Starting hybrid database seeding...')
     
+    // Try to connect to MongoDB first and clear if available
+    try {
+      const connectDB = (await import('./database')).default
+      const mongoConnection = await connectDB()
+      if (mongoConnection) {
+        console.log('📊 MongoDB connected - clearing collections...')
+        const { Product } = await import('./models/Product')
+        const { Artisan } = await import('./models/Artisan')
+        const { User } = await import('./models/User')
+        
+        await Product.deleteMany({})
+        await Artisan.deleteMany({})
+        await User.deleteMany({})
+        console.log('✅ MongoDB collections cleared')
+      }
+    } catch (mongoError: any) {
+      console.log('⚠️ MongoDB connection error:', mongoError.message)
+      console.log('⚠️ MongoDB not available, will use Firebase if configured')
+    }
+    
     const db = await getDatabaseService()
     
-    // Clear existing data
-    console.log('🗑️ Clearing existing data...')
-    try {
-      // Try to clear MongoDB collections
-      if (db.constructor.name === 'MongoDBService') {
-        console.log('📊 Using MongoDB - clearing collections')
-        // MongoDB clearing is handled by the models
-      } else {
-        console.log('🔥 Using Firebase - clearing collections')
-        // Firebase clearing would need to be implemented
+    // Clear existing data for Firebase if using Firebase
+    if (db.constructor.name === 'FirebaseDatabaseService') {
+      console.log('🔥 Using Firebase - clearing collections')
+      try {
+        const { db: firestore } = await import('./firebase')
+        if (firestore) {
+          const collections = ['artisans', 'products', 'users']
+          for (const col of collections) {
+            const snapshot = await firestore.collection(col).get()
+            const batch = firestore.batch()
+            snapshot.docs.forEach(doc => batch.delete(doc.ref))
+            if (snapshot.docs.length > 0) await batch.commit()
+          }
+          console.log('✅ Firebase collections cleared')
+        }
+      } catch (firebaseError) {
+        console.log('⚠️ Could not clear Firebase collections:', firebaseError)
       }
-    } catch {
-      console.log('⚠️ Could not clear existing data, continuing...')
     }
     
     // Create artisans first
@@ -250,14 +237,24 @@ export async function seedDatabase() {
       }
     }
     
-    // Update product artisan IDs
-    const updatedProducts = sampleProducts.map((product, index) => ({
-      ...product,
-      artisan: {
-        ...product.artisan,
-        id: createdArtisans[index]?.id || createdArtisans[index]?._id || `artisan-${index + 1}`
+    // Update product artisan IDs - assign to artisans based on region/specialization
+    const updatedProducts = sampleProducts.map((product) => {
+      // Find matching artisan or use first available
+      let assignedArtisan = createdArtisans[0]
+      if (product.artisan.id === "rajesh-negi-id" || product.category === "Agricultural") {
+        assignedArtisan = createdArtisans.find(a => a.name === "Rajesh Negi") || createdArtisans[0]
+      } else if (product.artisan.id === "meera-bisht-id" || product.category === "Handicraft") {
+        assignedArtisan = createdArtisans.find(a => a.name === "Meera Bisht") || createdArtisans[0]
       }
-    }))
+      
+      return {
+        ...product,
+        artisan: {
+          ...product.artisan,
+          id: assignedArtisan?.id || assignedArtisan?._id || product.artisan.id
+        }
+      }
+    })
     
     // Create products
     console.log('🌾 Creating products...')
@@ -343,15 +340,18 @@ export async function seedDatabase() {
   }
 }
 
-// Run seeding if called directly
-if (require.main === module) {
+// Run seeding if called directly (ES module compatible)
+const isMainModule = import.meta.url === `file://${process.argv[1]?.replace(/\\/g, '/')}` || 
+                     process.argv[1]?.includes('seed-hybrid')
+
+if (isMainModule) {
   seedDatabase()
     .then((result) => {
-      console.log('Seeding result:', result)
+      console.log('✅ Seeding result:', result)
       process.exit(0)
     })
     .catch((error) => {
-      console.error('Seeding failed:', error)
+      console.error('❌ Seeding failed:', error)
       process.exit(1)
     })
 }

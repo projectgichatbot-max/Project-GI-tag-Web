@@ -206,10 +206,10 @@ export default function DashboardPage() {
                       <div className="space-y-3">
                         <h4 className="font-semibold">Quick Actions</h4>
                         <div className="space-y-2">
-                          <Button size="sm" variant="outline" className="w-full justify-start bg-transparent">
+                          <Button size="sm" variant="outline" className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black">
                             <Bell className="h-4 w-4 mr-2" /> Notifications (3)
                           </Button>
-                          <Button size="sm" variant="outline" className="w-full justify-start bg-transparent">
+                          <Button size="sm" variant="outline" className="w-full justify-start bg-black text-white hover:bg-blue-500 hover:text-black">
                             <Share2 className="h-4 w-4 mr-2" /> Share Journey
                           </Button>
                         </div>
@@ -291,7 +291,7 @@ export default function DashboardPage() {
                           </div>
                           <p className="text-xs text-muted-foreground">Mentor: {item.mentor}</p>
                           <p className="text-xs text-muted-foreground line-clamp-2">{item.note}</p>
-                          <Button size="sm" variant="outline" className="w-full bg-transparent">Open Notes</Button>
+                          <Button size="sm" variant="outline" className="w-full bg-black text-white hover:bg-blue-500 hover:text-black">Open Notes</Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -360,7 +360,7 @@ export default function DashboardPage() {
                         <Badge key={interest} variant="secondary">{interest}</Badge>
                       ))}
                     </div>
-                    <Button size="sm" variant="outline" className="mt-2 bg-transparent">Edit Interests</Button>
+                    <Button size="sm" variant="outline" className="mt-2 bg-black text-white hover:bg-blue-500 hover:text-black">Edit Interests</Button>
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">Notification Preferences</label>
@@ -379,7 +379,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   </div>
-                  <Button variant="outline" className="w-full bg-transparent">Manage Preferences</Button>
+                  <Button variant="outline" className="w-full bg-black text-white hover:bg-blue-500 hover:text-black">Manage Preferences</Button>
                 </CardContent>
               </Card>
             </div>

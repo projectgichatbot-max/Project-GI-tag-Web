@@ -68,7 +68,7 @@ export function SpeechConsole() {
           )}
         </div>
         <div className="flex items-center gap-3">
-          <Badge className={status === 'recording' ? 'bg-destructive text-destructive-foreground' : 'bg-secondary text-secondary-foreground'}>
+          <Badge className={status === 'recording' ? 'bg-black text-white border-0' : 'bg-black text-white border-0'}>
             {status === 'recording' ? 'Recording' : status === 'processing' ? 'Processing' : 'Idle'}
           </Badge>
           {status === 'processing' && <Loader2 className="h-4 w-4 animate-spin" />}

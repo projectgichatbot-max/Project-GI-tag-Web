@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose'
+import mongoose, { Schema, model, Document } from 'mongoose'
 
 export interface IArtisan extends Document {
   name: string
@@ -131,4 +131,4 @@ ArtisanSchema.index({ district: 1 })
 ArtisanSchema.index({ region: 1 })
 ArtisanSchema.index({ specialization: 1 })
 
-export const Artisan = model<IArtisan>('Artisan', ArtisanSchema)
+export const Artisan = mongoose.models.Artisan || model<IArtisan>('Artisan', ArtisanSchema)
