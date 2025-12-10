@@ -5,9 +5,11 @@ export interface DatabaseService {
   // Products
   getProducts(filters?: any, pagination?: any): Promise<any>
   getProductById(id: string): Promise<any>
+  getProductReviews?(productId: string): Promise<any[]>
   createProduct(data: any): Promise<any>
   updateProduct(id: string, data: any): Promise<any>
   deleteProduct(id: string): Promise<any>
+  addProductReview(id: string, review: { user: string; rating: number; comment: string }): Promise<any>
   
   // Artisans
   getArtisans(filters?: any, pagination?: any): Promise<any>
@@ -74,6 +76,11 @@ class MongoDBService implements DatabaseService {
     return await Product.findById(id).lean()
   }
 
+  async getProductReviews(productId: string) {
+    const { Review } = await import('./models/Review')
+    return await Review.find({ productId }).sort({ createdAt: -1 }).lean()
+  }
+
   async createProduct(data: any) {
     const { Product } = await import('./models/Product')
     const product = new Product(data)
@@ -83,6 +90,35 @@ class MongoDBService implements DatabaseService {
   async updateProduct(id: string, data: any) {
     const { Product } = await import('./models/Product')
     return await Product.findByIdAndUpdate(id, data, { new: true })
+  }
+
+  async addProductReview(id: string, review: { user: string; rating: number; comment: string }) {
+    const { Product } = await import('./models/Product')
+    const { Review } = await import('./models/Review')
+    const product = await Product.findById(id)
+    if (!product) return null
+
+    await Review.create({
+      productId: product._id,
+      user: review.user || 'Guest',
+      rating: review.rating,
+      comment: review.comment,
+    })
+
+    const stats = await Review.aggregate([
+      { $match: { productId: product._id } },
+      { $group: { _id: '$productId', avg: { $avg: '$rating' }, count: { $sum: 1 } } }
+    ])
+
+    const avg = stats[0]?.avg ?? review.rating
+    const count = stats[0]?.count ?? 1
+
+    product.rating = Number(avg.toFixed(2))
+    product.reviewsCount = count
+    await product.save()
+
+    const reviews = await Review.find({ productId: product._id }).sort({ createdAt: -1 }).lean()
+    return { ...product.toObject(), reviews }
   }
 
   async deleteProduct(id: string) {
@@ -422,6 +458,36 @@ class FirebaseDatabaseService implements DatabaseService {
       _id: id,
       ...data,
       updatedAt: new Date()
+    }
+  }
+
+  async getProductReviews(productId: string) {
+    return [
+      {
+        id: `rev-${Date.now()}`,
+        productId,
+        user: 'Guest',
+        rating: 5,
+        comment: 'Sample review (mock database)',
+        createdAt: new Date().toISOString()
+      }
+    ]
+  }
+
+  async addProductReview(id: string, review: { user: string; rating: number; comment: string }) {
+    return {
+      _id: id,
+      rating: review.rating,
+      reviewsCount: 1,
+      reviews: [
+        {
+          id: `rev-${Date.now()}`,
+          user: review.user || 'Guest',
+          rating: review.rating,
+          comment: review.comment,
+          date: new Date().toISOString()
+        }
+      ]
     }
   }
 

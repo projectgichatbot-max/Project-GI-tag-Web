@@ -42,6 +42,15 @@ export interface IProduct extends Document {
   materials?: string
   cookingInstructions?: string[]
   seasonality?: string
+  recipes?: Array<{
+    title: string
+    summary?: string
+    prepTime?: string
+    cookTime?: string
+    serves?: string
+    ingredients?: string[]
+    steps?: string[]
+  }>
   reviews: Array<{
     id: string
     user: string
@@ -97,6 +106,15 @@ const ProductSchema = new Schema<IProduct>({
   materials: { type: String },
   cookingInstructions: [{ type: String }],
   seasonality: { type: String },
+  recipes: [{
+    title: { type: String, required: true },
+    summary: { type: String },
+    prepTime: { type: String },
+    cookTime: { type: String },
+    serves: { type: String },
+    ingredients: [{ type: String }],
+    steps: [{ type: String }]
+  }],
   reviews: [{
     id: { type: String, required: true },
     user: { type: String, required: true },

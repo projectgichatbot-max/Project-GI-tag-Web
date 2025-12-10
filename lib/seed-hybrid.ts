@@ -8,6 +8,8 @@ config() // Also load .env if exists
 import { getDatabaseService } from './database-service'
 import { FirebaseService, initializeFirebase } from './firebase'
 import { allGIProducts } from './gi-products-complete'
+import connectDB from './database'
+import { Review } from './models/Review'
 
 // Initialize Firebase after env vars are loaded
 initializeFirebase()
@@ -324,6 +326,15 @@ export async function seedDatabase() {
       console.log('✅ Created sample user')
     } catch (err: unknown) {
       console.error('❌ Failed to create sample user:', err)
+    }
+    
+    // Initialize reviews collection (without seeding data)
+    console.log('📝 Initializing reviews collection...')
+    try {
+      await Review.init() // This creates the collection with indexes
+      console.log('✅ Reviews collection initialized')
+    } catch (err: unknown) {
+      console.error('❌ Failed to initialize reviews collection:', err)
     }
     
     console.log('🎉 Hybrid database seeding completed successfully!')

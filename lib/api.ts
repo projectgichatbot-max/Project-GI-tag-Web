@@ -28,10 +28,18 @@ export interface Product {
   images: string[]
   rating: number
   reviewsCount: number
+  reviews?: Array<{
+    id: string
+    user: string
+    rating: number
+    comment: string
+    date: string
+  }>
   culturalValue: string
   available: boolean
   giCertified: boolean
   giRegistrationNumber?: string
+  recipes?: Recipe[]
   artisan: {
     id: string
     name: string
@@ -58,17 +66,20 @@ export interface Product {
   materials?: string
   cookingInstructions?: string[]
   seasonality?: string
-  reviews: Array<{
-    id: string
-    user: string
-    rating: number
-    comment: string
-    date: string
-  }>
   tags: string[]
   keywords: string[]
   createdAt: string
   updatedAt: string
+}
+
+export interface Recipe {
+  title: string
+  summary?: string
+  prepTime?: string
+  cookTime?: string
+  serves?: string
+  ingredients: string[]
+  steps: string[]
 }
 
 export interface Artisan {
@@ -159,6 +170,17 @@ export const productsApi = {
 
   async getById(id: string): Promise<ApiResponse<Product>> {
     const response = await fetch(`/api/products/${id}`)
+    return response.json()
+  },
+
+  async addReview(id: string, payload: { user?: string; rating: number; comment: string }): Promise<ApiResponse<Product>> {
+    const response = await fetch(`/api/products/${id}/reviews`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
     return response.json()
   },
 

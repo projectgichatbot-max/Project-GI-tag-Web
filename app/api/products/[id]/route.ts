@@ -1,5 +1,67 @@
 import { NextResponse } from "next/server"
 import { getDatabaseService } from "@/lib/database-service-fixed"
+
+function buildFallbackRecipes(product: any) {
+  const name = product?.name || "Heritage Ingredient"
+  const isDrink = /tea|sharbat|juice/i.test(name)
+  const isGrain = /rice|millet|dal|beans|gram|lentil|soybean|oil|fruit|spice/i.test(name)
+
+  if (product?.recipes && product.recipes.length) return product.recipes
+
+  if (isDrink) {
+    return [
+      {
+        title: `${name} Refresh`,
+        summary: `Traditional beverage using ${name}.`,
+        prepTime: "10 mins",
+        cookTime: "10 mins",
+        serves: "2",
+        ingredients: [`2 cups water`, `2 tsp ${name}`, `Honey or jaggery`, `Lemon slice`],
+        steps: [
+          "Boil water and add the main ingredient.",
+          "Steep for 5 minutes and strain.",
+          "Sweeten to taste and serve warm.",
+        ],
+      },
+    ]
+  }
+
+  if (isGrain) {
+    return [
+      {
+        title: `${name} Pahadi Bowl`,
+        summary: `Simple heritage preparation highlighting ${name}.`,
+        prepTime: "15 mins",
+        cookTime: "25 mins",
+        serves: "3-4",
+        ingredients: [`1 cup ${name}`, "2 cups water/stock", "1 tsp ghee", "Cumin, turmeric, salt"],
+        steps: [
+          `Rinse and soak ${name} (if needed) for 20 minutes.`,
+          "Temper ghee with cumin and turmeric.",
+          "Add the ingredient, then water and salt; simmer till tender.",
+          "Rest 5 minutes and serve warm.",
+        ],
+      },
+    ]
+  }
+
+  return [
+    {
+      title: `${name} Showcase`,
+      summary: "Cultural presentation to enjoy this heritage item.",
+      prepTime: "15 mins",
+      cookTime: "30 mins",
+      serves: "4",
+      ingredients: [name, "Regional herbs/spices", "Local accompaniments"],
+      steps: [
+        `Feature ${name} as the hero ingredient.`,
+        "Prepare a gentle base or platter to highlight its aroma.",
+        "Combine and warm carefully without overpowering flavors.",
+        "Serve with a short note on its origin and GI story.",
+      ],
+    },
+  ]
+}
 // (Optional) import Cloudinary helpers if/when you add image diff cleanup
 
 // Whitelist of fields allowed to be updated to avoid accidental/hostile overwrite
@@ -27,7 +89,8 @@ function filterUpdatableFields(data: any) {
 export async function GET(_req: Request, context: any) {
   try {
     const db = await getDatabaseService()
-    const id = context?.params?.id
+    const params = await context?.params
+    const id = params?.id
     if (!id) {
       return NextResponse.json({ success: false, error: 'Missing product id' }, { status: 400 })
     }
@@ -39,7 +102,19 @@ export async function GET(_req: Request, context: any) {
         { status: 404 }
       )
     }
-    
+
+    product.recipes = buildFallbackRecipes(product)
+    if ("getProductReviews" in db && typeof (db as any).getProductReviews === "function") {
+      const reviews = await (db as any).getProductReviews(id)
+      product.reviews = reviews?.map((r: any) => ({
+        id: r._id?.toString?.() || r.id,
+        user: r.user,
+        rating: r.rating,
+        comment: r.comment,
+        date: r.createdAt || r.date,
+      }))
+    }
+
     return NextResponse.json({
       success: true,
       data: product
