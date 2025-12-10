@@ -313,7 +313,7 @@ export default function HomePage() {
                       <span className="text-sm ml-1">{product.rating}</span>
                     </div>
                   <Link href={`/heritage`}>
-                    <Button size="sm" variant="ghost" className="text-primary">View Details</Button>
+                    <Button size="sm" variant="ghost" className="text-primary text-white">View Details</Button>
                   </Link>
                   </div>
                 </div>
