@@ -25,6 +25,7 @@ export default function ProductDetailPage() {
   const [newRating, setNewRating] = useState(5)
   const [newComment, setNewComment] = useState("")
   const [newUser, setNewUser] = useState("")
+  const [activeTab, setActiveTab] = useState("overview")
 
   useEffect(() => {
     let active = true
@@ -186,7 +187,12 @@ export default function ProductDetailPage() {
                   <span className="ml-1 font-semibold">{rating}</span>
                   <span className="text-muted-foreground ml-1">({reviewsCount} reviews)</span>
                 </div>
-                <Button variant="ghost" size="sm" className="text-primary text-white">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-primary text-white"
+                  onClick={() => setActiveTab("reviews")}
+                >
                   Write a Review
                 </Button>
               </div>
@@ -218,7 +224,7 @@ export default function ProductDetailPage() {
         </div>
 
         <div className="mt-16">
-          <Tabs defaultValue="overview" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="health">Health Benefits</TabsTrigger>
@@ -428,7 +434,13 @@ export default function ProductDetailPage() {
               <div className="max-w-4xl">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-semibold">Community Reflections</h3>
-                  <Button variant="outline" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      const form = document.getElementById("review-form")
+                      form?.scrollIntoView({ behavior: "smooth", block: "center" })
+                    }}
+                  >
                     Share Insight
                   </Button>
                 </div>
@@ -515,7 +527,7 @@ export default function ProductDetailPage() {
                   )}
                 </div>
 
-                <Card className="mt-8">
+                <Card className="mt-8" id="review-form">
                   <CardContent className="p-6 space-y-4">
                     <h4 className="text-lg font-semibold">Add your rating</h4>
                     {error && <p className="text-sm text-red-500">{error}</p>}
