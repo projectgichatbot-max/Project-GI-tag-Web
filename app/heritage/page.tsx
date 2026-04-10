@@ -441,8 +441,8 @@ export default function HeritagePage() {
             </div>
             <div className="relative">
               <Image
-                src="/placeholder.svg?key=heritage"
-                alt="Heritage preservation"
+                src="/heritage-preservation.jpg"
+                alt="Hands weaving a traditional basket (heritage preservation)"
                 width={600}
                 height={400}
                 className="rounded-lg shadow-lg"

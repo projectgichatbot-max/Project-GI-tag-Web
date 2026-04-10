@@ -1,253 +1,198 @@
+"use client"
+
+import { useState } from "react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { MapPin, Phone, Mail, Clock, MessageSquare, HeadphonesIcon, Users, Globe } from "lucide-react"
+import { MapPin, Phone, Mail, MessageSquare, Loader2 } from "lucide-react"
 
 export default function ContactPage() {
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  const [subject, setSubject] = useState("")
+  const [message, setMessage] = useState("")
+  const [submitting, setSubmitting] = useState(false)
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSubmitting(true)
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          phone: phone || undefined,
+          subject: subject || "General Inquiry",
+          message,
+          addressHint: "Dehradun",
+        }),
+      })
+
+      const json = await res.json()
+      if (!res.ok || !json?.success) {
+        toast.error(json?.error || "Failed to send message. Please try again.")
+        return
+      }
+
+      toast.success(`Message sent. Ticket: ${json.data.ticketNumber}`)
+      setName("")
+      setEmail("")
+      setPhone("")
+      setSubject("")
+      setMessage("")
+    } catch {
+      toast.error("Something went wrong. Please try again.")
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
-    <div className="min-h-screen py-20">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-black text-white border-0">Get in Touch</Badge>
-          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-balance">Contact Us</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
-            Have questions about our GI-tagged products, need support, or want to connect with artisans? We're here to
-            help preserve and promote Uttarakhand's cultural heritage.
-          </p>
+    <div className="min-h-screen pt-16">
+      <section className="py-14 bg-muted">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center">
+            <Badge className="mb-4 bg-black text-white border-0">Contact</Badge>
+            <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 text-balance">Contact Us</h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
+              Questions, feedback, or collaboration ideas—send us a message and we’ll get back to you.
+            </p>
+          </div>
         </div>
+      </section>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Contact Form */}
-          <div className="lg:col-span-2">
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-2xl font-serif">Send us a Message</CardTitle>
-                <p className="text-muted-foreground">
-                  Fill out the form below and we'll get back to you within 24 hours.
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">First Name</label>
-                    <Input placeholder="Enter your first name" />
+      <section className="py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
+            {/* Left: Contact details + Map */}
+            <div className="space-y-6">
+              <Card className="border-0 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-2xl font-serif">Reach us directly</CardTitle>
+                  <p className="text-muted-foreground">We’re based in Dehradun.</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-primary/10 p-2 rounded-lg">
+                      <Mail className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <div className="font-semibold">Email</div>
+                      <a className="text-sm text-muted-foreground underline" href="mailto:projectgichatbot@gmail.com">
+                        projectgichatbot@gmail.com
+                      </a>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Last Name</label>
-                    <Input placeholder="Enter your last name" />
+
+                  <div className="flex items-start gap-3">
+                    <div className="bg-primary/10 p-2 rounded-lg">
+                      <Phone className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <div className="font-semibold">Phone</div>
+                      <a className="text-sm text-muted-foreground underline" href="tel:+919720444666">
+                        097204 44666
+                      </a>
+                    </div>
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Email Address</label>
-                  <Input type="email" placeholder="your.email@example.com" />
-                </div>
+                  <div className="flex items-start gap-3">
+                    <div className="bg-primary/10 p-2 rounded-lg">
+                      <MapPin className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <div className="font-semibold">Address</div>
+                      <div className="text-sm text-muted-foreground">Dehradun, Uttarakhand</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Phone Number (Optional)</label>
-                  <Input type="tel" placeholder="+91 XXXXX XXXXX" />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Subject</label>
-                  <Input placeholder="What is this regarding?" />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Message</label>
-                  <Textarea
-                    placeholder="Tell us about your inquiry, feedback, or how we can help you..."
-                    className="min-h-[120px]"
+              <Card className="border-0 shadow-lg overflow-hidden">
+                <CardHeader>
+                  <CardTitle className="text-2xl font-serif">Locate us:</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <iframe
+                    title="Dehradun Google Map"
+                    src="https://www.google.com/maps?q=Dehradun,+Uttarakhand&output=embed"
+                    className="w-full h-80 border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
                   />
-                </div>
+                </CardContent>
+              </Card>
+            </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Inquiry Type</label>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      "Product Information",
-                      "Artisan Connection",
-                      "Bulk Orders",
-                      "Partnership",
-                      "Technical Support",
-                      "Cultural Heritage",
-                      "Other",
-                    ].map((type) => (
-                      <Badge
-                        key={type}
-                        variant="outline"
-                        className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-                      >
-                        {type}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <Button className="w-full bg-black text-white hover:bg-blue-500 hover:text-black">
-                  Send Message
-                  <MessageSquare className="ml-2 h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Contact Information */}
-          <div className="space-y-6">
-            {/* Contact Details */}
+            {/* Right: Form */}
             <Card className="border-0 shadow-lg">
               <CardHeader>
-                <CardTitle className="text-xl font-serif">Contact Information</CardTitle>
+                <CardTitle className="text-2xl font-serif">Send a message</CardTitle>
+                <p className="text-muted-foreground">Your message will be saved in MongoDB (`contacts` collection).</p>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <div className="bg-primary/10 p-2 rounded-lg">
-                    <MapPin className="h-5 w-5 text-primary" />
+              <CardContent>
+                <form className="space-y-4" onSubmit={onSubmit}>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Full name</label>
+                    <Input value={name} onChange={(e) => setName(e.target.value)} required placeholder="Your name" />
                   </div>
-                  <div>
-                    <h4 className="font-semibold">Address</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Heritage Preservation Center
-                      <br />
-                      Dehradun, Uttarakhand 248001
-                      <br />
-                      India
-                    </p>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Email</label>
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      placeholder="you@example.com"
+                    />
                   </div>
-                </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Phone (optional)</label>
+                    <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="097204 44666" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Subject</label>
+                    <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Message</label>
+                    <Textarea
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      required
+                      className="min-h-[140px]"
+                      placeholder="Write your message..."
+                    />
+                  </div>
 
-                <div className="flex items-start space-x-3">
-                  <div className="bg-primary/10 p-2 rounded-lg">
-                    <Phone className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">Phone</h4>
-                    <p className="text-sm text-muted-foreground">
-                      +91 135 XXX XXXX
-                      <br />
-                      +91 98XXX XXXXX (WhatsApp)
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <div className="bg-primary/10 p-2 rounded-lg">
-                    <Mail className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">Email</h4>
-                    <p className="text-sm text-muted-foreground">
-                      info@uttarakhandheritage.com
-                      <br />
-                      support@uttarakhandheritage.com
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <div className="bg-primary/10 p-2 rounded-lg">
-                    <Clock className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">Business Hours</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Monday - Friday: 9:00 AM - 6:00 PM
-                      <br />
-                      Saturday: 10:00 AM - 4:00 PM
-                      <br />
-                      Sunday: Closed
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Support Options */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-xl font-serif">Support Options</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center space-x-3 p-3 bg-muted rounded-lg">
-                  <HeadphonesIcon className="h-5 w-5 text-primary" />
-                  <div>
-                    <h4 className="font-semibold text-sm">Live Chat</h4>
-                    <p className="text-xs text-muted-foreground">Available 9 AM - 6 PM</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3 p-3 bg-muted rounded-lg">
-                  <Users className="h-5 w-5 text-primary" />
-                  <div>
-                    <h4 className="font-semibold text-sm">Artisan Connect</h4>
-                    <p className="text-xs text-muted-foreground">Direct artisan communication</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3 p-3 bg-muted rounded-lg">
-                  <Globe className="h-5 w-5 text-primary" />
-                  <div>
-                    <h4 className="font-semibold text-sm">Community Forum</h4>
-                    <p className="text-xs text-muted-foreground">Connect with other enthusiasts</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Quick Links */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-xl font-serif">Quick Links</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Button variant="ghost" className="w-full justify-start">
-                  Frequently Asked Questions
-                </Button>
-                <Button variant="ghost" className="w-full justify-start">
-                  Shipping & Returns
-                </Button>
-                <Button variant="ghost" className="w-full justify-start">
-                  Artisan Guidelines
-                </Button>
-                <Button variant="ghost" className="w-full justify-start">
-                  Bulk Order Inquiry
-                </Button>
-                <Button variant="ghost" className="w-full justify-start">
-                  Partnership Opportunities
-                </Button>
+                  <Button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full bg-black text-white hover:bg-blue-500 hover:text-black"
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        Send Message <MessageSquare className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </form>
               </CardContent>
             </Card>
           </div>
         </div>
-
-        {/* Map Section */}
-        <div className="mt-16">
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-2xl font-serif">Visit Our Heritage Center</CardTitle>
-              <p className="text-muted-foreground">
-                Located in the heart of Dehradun, our center showcases authentic GI-tagged products and hosts cultural
-                workshops.
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-muted rounded-lg h-64 flex items-center justify-center">
-                <div className="text-center">
-                  <MapPin className="h-12 w-12 text-primary mx-auto mb-4" />
-                  <p className="text-muted-foreground">
-                    Interactive map will be integrated here
-                    <br />
-                    showing our location in Dehradun, Uttarakhand
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      </section>
     </div>
   )
 }

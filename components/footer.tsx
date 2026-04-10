@@ -204,6 +204,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/contact" className="hover:text-white transition-colors text-sm">
+                  Contact Us
+                </Link>
+              </li>
+              <li>
                 <Link href="/artisans" className="hover:text-white transition-colors text-sm">
                   Artisan Stories
                 </Link>
@@ -295,7 +300,7 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0">
             <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
               <p className="text-sm text-white/60">
-                &copy; 2025 Uttarakhand Heritage. Preserving culture through technology.
+                &copy; 2026 Uttarakhand Heritage. Preserving culture through technology.
               </p>
             </div>
           </div>

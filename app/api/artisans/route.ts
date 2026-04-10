@@ -1,48 +1,78 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getDatabaseService } from "@/lib/database-service-fixed"
+import connectDB from "@/lib/database"
+import { Artisan } from "@/lib/models/Artisan"
 
 export async function GET(request: NextRequest) {
   try {
-    const db = await getDatabaseService()
+    await connectDB()
     
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
+    const limit = parseInt(searchParams.get('limit') || '50')
+    const skip = (page - 1) * limit
+
     const region = searchParams.get('region')
     const specialization = searchParams.get('specialization')
     const search = searchParams.get('search')
-    const village = searchParams.get('village')
-    
+    const featured = searchParams.get('featured')
+
     // Build filter object
     const filter: any = {}
-    
+
     if (region && region !== 'all') {
-      filter.region = region
+      filter.region = { $regex: region, $options: 'i' }
     }
-    
+
     if (specialization && specialization !== 'all') {
-      filter.specialization = specialization
+      filter.specialization = { $regex: specialization, $options: 'i' }
     }
-    
-    if (village && village !== 'all') {
-      filter.village = village
+
+    if (featured === 'true') {
+      filter.featured = true
     }
-    
-    const pagination = { page, limit }
-    
-    // Get artisans with pagination
-    const result = await db.getArtisans(filter, pagination)
-    
-    // Handle search separately if provided
-    if (search) {
-      const searchResults = await db.search(search, 'artisans', limit)
-      result.data = searchResults.artisans
+
+    // Full-text search across key fields
+    if (search && search.trim()) {
+      const searchRegex = new RegExp(search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')
+      filter.$or = [
+        { name: searchRegex },
+        { bio: searchRegex },
+        { specialization: searchRegex },
+        { district: searchRegex },
+        { village: searchRegex },
+        { region: searchRegex },
+        { skills: searchRegex },
+        { tags: searchRegex },
+      ]
     }
-    
+
+    const [artisans, total] = await Promise.all([
+      Artisan.find(filter)
+        .sort({ featured: -1, rating: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Artisan.countDocuments(filter),
+    ])
+
+    // Serialize MongoDB _id to string
+    const serialized = artisans.map((a: any) => ({
+      ...a,
+      _id: a._id?.toString(),
+      products: (a.products || []).map((p: any) => (typeof p === 'object' ? p?.toString() : p)),
+    }))
+
     return NextResponse.json({
       success: true,
-      data: result.data,
-      pagination: result.pagination
+      data: serialized,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        itemsPerPage: limit,
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1,
+      }
     })
   } catch (error) {
     console.error('Error fetching artisans:', error)
@@ -55,7 +85,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const db = await getDatabaseService()
+    await connectDB()
     const body = await request.json()
 
     const required = ['name', 'village', 'district', 'region', 'specialization', 'experience', 'bio']
@@ -65,7 +95,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const newArtisan = await db.createArtisan({
+    const newArtisan = new Artisan({
       ...body,
       tags: body.tags || [],
       keywords: body.keywords || [],
@@ -73,9 +103,11 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date()
     })
 
+    const saved = await newArtisan.save()
+
     return NextResponse.json({
       success: true,
-      data: newArtisan,
+      data: { ...saved.toObject(), _id: saved._id.toString() },
       message: 'Artisan created successfully'
     }, { status: 201 })
   } catch (error) {

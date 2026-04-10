@@ -87,12 +87,25 @@ export async function GET(request: NextRequest) {
       filter.region = region
     }
     
-    if (giCertified === 'true') {
-      filter.giCertified = true
-    }
+    if (giCertified === 'true') filter.giCertified = true
+    if (giCertified === 'false') filter.giCertified = false
     
     if (available === 'true') {
       filter.available = true
+    }
+
+    // Apply search while preserving other filters/pagination
+    if (search && search.trim()) {
+      const searchRegex = new RegExp(search.trim(), 'i')
+      filter.$or = [
+        { name: searchRegex },
+        { description: searchRegex },
+        { longDescription: searchRegex },
+        { culturalSignificance: searchRegex },
+        { region: searchRegex },
+        { tags: searchRegex },
+        { keywords: searchRegex },
+      ]
     }
     
     const pagination = { page, limit }
@@ -100,12 +113,6 @@ export async function GET(request: NextRequest) {
     // Get products with pagination
     const result = await db.getProducts(filter, pagination)
     
-    // Handle search separately if provided
-    if (search) {
-      const searchResults = await db.search(search, 'products', limit)
-      result.data = searchResults.products
-    }
-
     result.data = result.data.map((item: any) => ({
       ...item,
       recipes: buildFallbackRecipes(item),

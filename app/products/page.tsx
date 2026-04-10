@@ -13,6 +13,8 @@ import { productsApi, type Product } from "@/lib/api"
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<string[]>(["All", "Agricultural", "Handicraft", "Textile"])
+  const [regions, setRegions] = useState<string[]>(["All"])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -35,34 +37,29 @@ export default function ProductsPage() {
   const hasInitializedRef = useRef(false)
   const currentRequestIdRef = useRef(0)
 
-  // Categories based on actual seeded data
-  const categories = ["All", "Agricultural", "Handicraft", "Textile"]
-  
-  // Regions based on actual seeded data
-  const regions = [
-    "All",
-    "Almora",
-    "Almora, Bageshwar, Chamoli",
-    "Almora, Chamoli",
-    "Bageshwar, Almora",
-    "Chamoli",
-    "Chamoli, Pithoragarh",
-    "Chamoli, Tehri",
-    "Chamoli, Uttarakhand",
-    "Chamoli, Uttarkashi",
-    "Dehradun, Haridwar, Udham Singh Nagar",
-    "Garhwal region",
-    "Kumaon",
-    "Kumaon & Garhwal",
-    "Kumaon region",
-    "Nainital",
-    "Pauri Garhwal",
-    "Pithoragarh (Berinag)",
-    "Pithoragarh district",
-    "Ramgarh, Nainital",
-    "Ramnagar, Nainital",
-    "Uttarkashi"
-  ]
+  // Fetch filter options (category/region) from DB/dataset
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch("/api/products/meta")
+        const json = await res.json()
+        if (!cancelled && json?.success && json?.data) {
+          if (Array.isArray(json.data.categories) && json.data.categories.length) {
+            setCategories(json.data.categories)
+          }
+          if (Array.isArray(json.data.regions) && json.data.regions.length) {
+            setRegions(json.data.regions)
+          }
+        }
+      } catch {
+        // Keep fallback defaults
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
   
   const sortOptions = [
     { value: "newest", label: "Newest First" },

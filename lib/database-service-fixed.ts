@@ -1,5 +1,6 @@
 import connectDB from './database'
 import { FirebaseService, COLLECTIONS, initializeFirebase } from './firebase'
+import { allGIProducts } from "./gi-products-complete"
 
 export interface DatabaseService {
   // Products
@@ -395,34 +396,55 @@ class MongoDBService implements DatabaseService {
 class FirebaseDatabaseService implements DatabaseService {
   async getProducts(filters: any = {}, pagination: any = {}) {
     const { page = 1, limit = 10 } = pagination
-    
-    // For now, return mock data since Firebase is not configured
-    const mockProducts = [
-      {
-        _id: '1',
-        name: 'Munsiyari Rajma',
-        category: 'Agricultural',
-        region: 'Pithoragarh District (Munsiyari)',
-        description: 'Small-sized red beans, rich in taste, grown in high-altitude organic conditions',
-        rating: 4.8,
-        reviews: 124,
-        available: true,
-        giCertified: true,
-        images: ['/munsiyari-rajma-kidney-beans-red.jpg'],
-        createdAt: new Date(),
-        updatedAt: new Date()
+
+    // Fallback dataset (when MongoDB isn't available)
+    const dataset = allGIProducts.map((p, idx) => ({
+      _id: `seed-${idx + 1}`,
+      createdAt: new Date(2024, 0, 1 + idx).toISOString(),
+      updatedAt: new Date(2024, 0, 1 + idx).toISOString(),
+      ...p,
+    }))
+
+    const matchesFilter = (item: any) => {
+      // Exact matches (category/region/available/giCertified)
+      for (const [key, value] of Object.entries(filters || {})) {
+        if (key === "$or") continue
+        if (value === undefined) continue
+        if (item[key] !== value) return false
       }
-    ]
-    
+
+      // $or search support
+      if (filters?.$or && Array.isArray(filters.$or) && filters.$or.length) {
+        const anyMatch = filters.$or.some((cond: any) => {
+          const [field, regex] = Object.entries(cond || {})[0] || []
+          if (!field || !(regex instanceof RegExp)) return false
+          const raw = item[field]
+          if (raw == null) return false
+          if (Array.isArray(raw)) return raw.some((v) => typeof v === "string" && regex.test(v))
+          return typeof raw === "string" ? regex.test(raw) : false
+        })
+        if (!anyMatch) return false
+      }
+
+      return true
+    }
+
+    const filtered = dataset.filter(matchesFilter)
+    const total = filtered.length
+    const totalPages = Math.max(1, Math.ceil(total / limit))
+    const safePage = Math.min(Math.max(1, page), totalPages)
+    const start = (safePage - 1) * limit
+    const data = filtered.slice(start, start + limit)
+
     return {
-      data: mockProducts,
+      data,
       pagination: {
-        currentPage: page,
-        totalPages: 1,
-        totalItems: mockProducts.length,
+        currentPage: safePage,
+        totalPages: totalPages,
+        totalItems: total,
         itemsPerPage: limit,
-        hasNextPage: false,
-        hasPrevPage: false
+        hasNextPage: safePage < totalPages,
+        hasPrevPage: safePage > 1
       }
     }
   }

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import dns from 'node:dns'
 
 /**
  * Global is used here to maintain a cached connection across hot reloads
@@ -53,8 +54,39 @@ async function connectDB() {
 
   try {
     cached.conn = await cached.promise
-  } catch {
+  } catch (error: any) {
     cached.promise = null
+
+    // Some networks block default DNS SRV lookups used by mongodb+srv URIs.
+    // Retry once with public DNS resolvers before giving up.
+    const isSrvUri = MONGODB_URI.startsWith('mongodb+srv://')
+    const isSrvDnsError =
+      typeof error?.message === 'string' &&
+      (error.message.includes('querySrv') || error.message.includes('ECONNREFUSED') || error.message.includes('ENOTFOUND'))
+
+    if (isSrvUri && isSrvDnsError) {
+      try {
+        const currentDns = dns.getServers()
+        const fallbackDns = ['8.8.8.8', '1.1.1.1']
+        const hasFallback = fallbackDns.every((server) => currentDns.includes(server))
+        if (!hasFallback) {
+          dns.setServers(fallbackDns)
+          console.log('🌐 Retrying MongoDB with fallback DNS resolvers')
+        }
+
+        const opts = { bufferCommands: false }
+        cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {
+          console.log('✅ Connected to MongoDB (fallback DNS)')
+          return m
+        })
+        cached.conn = await cached.promise
+        return cached.conn
+      } catch (retryError: any) {
+        cached.promise = null
+        console.error('❌ MongoDB retry failed:', retryError?.message || 'Unknown error')
+      }
+    }
+
     console.log('🔄 MongoDB connection failed, using Firebase')
     return null
   }

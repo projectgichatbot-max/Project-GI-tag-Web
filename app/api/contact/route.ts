@@ -1,11 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getDatabaseService } from "@/lib/database-service-fixed"
+import connectDB from "@/lib/database"
 
 export async function POST(request: NextRequest) {
   try {
-  const db = await getDatabaseService()
-  const body = await request.json()
-    const { name, email, subject, message, inquiryType } = body
+    const body = await request.json()
+    const { name, email, subject, message, phone, addressHint } = body
 
     // Validate required fields
     if (!name || !email || !message) {
@@ -15,28 +14,40 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const savedInquiry: any = await db.createInquiry({
+    // Prefer MongoDB `contacts` collection
+    const conn = await connectDB()
+    if (!conn) {
+      const hasMongoUri = Boolean(process.env.MONGODB_URI)
+      return NextResponse.json(
+        {
+          success: false,
+          error: hasMongoUri
+            ? "MongoDB connection failed. Check Atlas network access, DNS/SRV resolution, and connection string."
+            : "MongoDB is not configured. Please set MONGODB_URI to enable contact submissions.",
+        },
+        { status: 500 }
+      )
+    }
+
+    const { Contact } = await import("@/lib/models/Contact")
+    const saved = await Contact.create({
       name,
       email,
-      subject: subject || 'General Inquiry',
+      phone: phone || undefined,
+      subject: subject || "General Inquiry",
       message,
-      inquiryType: inquiryType || 'general',
-      status: 'pending',
-      priority: 'medium',
-      tags: [],
-      createdAt: new Date(),
-      updatedAt: new Date()
+      addressHint: addressHint || "Dehradun",
     })
 
 
     return NextResponse.json({
       success: true,
       data: {
-        id: savedInquiry._id,
-        status: savedInquiry.status,
+        id: saved._id,
+        status: "received",
         message: "Thank you for your inquiry. We will respond within 24 hours.",
         estimatedResponse: "24 hours",
-        ticketNumber: `GI-${savedInquiry._id?.toString?.().slice(-6).toUpperCase()}`
+        ticketNumber: `GI-${saved._id?.toString?.().slice(-6).toUpperCase()}`
       }
     }, { status: 201 })
   } catch (error) {
@@ -50,29 +61,31 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-  const db = await getDatabaseService()
+    // Admin/listing endpoint for contact messages (MongoDB only)
+    const conn = await connectDB()
+    if (!conn) {
+      const hasMongoUri = Boolean(process.env.MONGODB_URI)
+      return NextResponse.json(
+        {
+          success: false,
+          error: hasMongoUri
+            ? "MongoDB connection failed. Check Atlas network access, DNS/SRV resolution, and connection string."
+            : "MongoDB is not configured.",
+        },
+        { status: 500 }
+      )
+    }
     
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
-    const status = searchParams.get('status')
-    const priority = searchParams.get('priority')
-    
-    // Build filter object
-    const filter: any = {}
-    
-    if (status && status !== 'all') {
-      filter.status = status
-    }
-    
-    if (priority && priority !== 'all') {
-      filter.priority = priority
-    }
-    
-  // Get inquiries with pagination via service
-    const raw = await db.getInquiries(filter, { page, limit })
-    const inquiries = raw.data
-    const total = raw.pagination.totalItems
+
+    const { Contact } = await import("@/lib/models/Contact")
+    const skip = (page - 1) * limit
+    const [data, total] = await Promise.all([
+      Contact.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      Contact.countDocuments({}),
+    ])
     
     // Calculate pagination info
     const totalPages = Math.ceil(total / limit)
@@ -81,7 +94,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       success: true,
-      data: inquiries,
+      data,
       pagination: {
         currentPage: page,
         totalPages,
@@ -94,7 +107,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching inquiries:', error)
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch inquiries' },
+      { success: false, error: 'Failed to fetch contact messages' },
       { status: 500 }
     )
   }

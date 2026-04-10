@@ -1,24 +1,63 @@
 import { NextResponse } from "next/server"
 import connectDB from "@/lib/database"
 import { Artisan } from "@/lib/models/Artisan"
+import { Product } from "@/lib/models/Product"
 import { CloudinaryService } from "@/lib/cloudinary"
 
 export async function GET(_req: Request, context: any) {
   try {
     await connectDB()
     const id = context?.params?.id
-    const artisan = await Artisan.findById(id).lean()
-    
+    const artisan = await Artisan.findById(id).lean() as any
+
     if (!artisan) {
       return NextResponse.json(
         { success: false, error: 'Artisan not found' },
         { status: 404 }
       )
     }
-    
+
+    // Fetch linked products — by stored product IDs OR by artisan name match
+    let linkedProducts: any[] = []
+    try {
+      if (artisan.products && artisan.products.length > 0) {
+        // Try to find by stored product IDs
+        const { default: mongoose } = await import('mongoose')
+        const validIds = (artisan.products as string[]).filter((pid: string) => mongoose.Types.ObjectId.isValid(pid))
+        if (validIds.length > 0) {
+          linkedProducts = await Product.find({
+            _id: { $in: validIds }
+          }).select('name category images cloudinaryPublicIds description region rating reviewsCount giCertified').lean()
+        }
+      }
+
+      // Fallback: match by artisan name in product.artisan.name
+      if (linkedProducts.length === 0 && artisan.name) {
+        linkedProducts = await Product.find({
+          'artisan.name': { $regex: artisan.name.split(' ')[0], $options: 'i' }
+        }).select('name category images cloudinaryPublicIds description region rating reviewsCount giCertified').limit(10).lean()
+      }
+    } catch (e) {
+      // Non-fatal — return artisan without products
+      linkedProducts = []
+    }
+
+    // Serialize
+    const serializedArtisan = {
+      ...artisan,
+      _id: artisan._id?.toString(),
+      products: (artisan.products || []).map((p: any) => (typeof p === 'object' ? p?.toString() : p)),
+    }
+
+    const serializedProducts = linkedProducts.map((p: any) => ({
+      ...p,
+      _id: p._id?.toString(),
+    }))
+
     return NextResponse.json({
       success: true,
-      data: artisan
+      data: serializedArtisan,
+      linkedProducts: serializedProducts,
     })
   } catch (error) {
     console.error('Error fetching artisan:', error)
@@ -28,6 +67,7 @@ export async function GET(_req: Request, context: any) {
     )
   }
 }
+
 
 export async function PUT(req: Request, context: any) {
   try {
