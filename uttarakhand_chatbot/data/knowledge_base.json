@@ -1,0 +1,458 @@
+[
+  {
+    "name": "Kafuli",
+    "tag": "food",
+    "description": "Kafuli is a traditional dish from the Garhwal region of Uttarakhand, made primarily from spinach and fenugreek leaves. It is cooked in an iron kadhai which gives it a distinctive dark colour and earthy flavour. Kafuli is considered a comfort food in the hills and is typically served with steamed rice.",
+    "ingredients": [
+      "spinach",
+      "fenugreek leaves",
+      "rice paste",
+      "cumin seeds",
+      "turmeric",
+      "green chillies",
+      "garlic",
+      "salt"
+    ],
+    "recipe": [
+      "Wash and finely chop spinach and fenugreek leaves.",
+      "Boil the greens in water until soft, then drain and grind into a smooth paste.",
+      "Prepare a thin rice paste by mixing rice flour with water.",
+      "Heat an iron kadhai, add cumin seeds, garlic, and green chillies.",
+      "Add the green paste and rice paste, stir continuously on low flame.",
+      "Cook until the mixture thickens and starts leaving the sides of the kadhai. Serve hot with rice."
+    ],
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Phaanu",
+    "tag": "food",
+    "description": "Phaanu is a staple lentil dish of Uttarakhand, especially popular in the Garhwal region. It is made by soaking and grinding a mixture of lentils like gahat (horse gram), urad dal, and other local pulses. The dish is slow-cooked for hours, resulting in a thick, flavourful preparation served with rice and chutney.",
+    "ingredients": [
+      "gahat (horse gram)",
+      "urad dal",
+      "cumin seeds",
+      "turmeric",
+      "ginger",
+      "garlic",
+      "ghee",
+      "salt"
+    ],
+    "recipe": [
+      "Soak gahat and urad dal overnight in water.",
+      "Drain and grind the soaked lentils into a coarse paste.",
+      "Mix the paste with water and add turmeric, salt, and ginger.",
+      "Cook on a very low flame for 4-5 hours, stirring occasionally.",
+      "In a separate pan, prepare a tempering of ghee, cumin seeds, and garlic.",
+      "Pour the tempering over the cooked phaanu and serve with steamed rice."
+    ],
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Bal Mithai",
+    "tag": "food",
+    "description": "Bal Mithai is a famous sweet from Almora in the Kumaon region of Uttarakhand. It is made from roasted khoya (reduced milk) coated with white sugar balls called khas khas. This chocolate-brown fudge-like sweet is a beloved souvenir for tourists visiting Almora and has been made traditionally for over a century.",
+    "ingredients": [
+      "khoya (dried whole milk)",
+      "sugar",
+      "khas khas (white sugar balls)",
+      "ghee",
+      "cardamom powder",
+      "cocoa or caramelised sugar for colour"
+    ],
+    "recipe": [
+      "Roast khoya in ghee on a low flame until it turns dark brown.",
+      "Add sugar and cardamom powder, mix well until the sugar dissolves.",
+      "Cook until the mixture thickens and pulls away from the pan.",
+      "Spread the mixture evenly on a greased tray and let it cool slightly.",
+      "While still warm, press white sugar balls (khas khas) firmly onto the surface.",
+      "Allow to cool completely, then cut into rectangular pieces."
+    ],
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Singodi",
+    "tag": "food",
+    "description": "Singodi is a traditional sweet from the Kumaon region of Uttarakhand, wrapped in maalu leaf. It is made from grated coconut and khoya, sweetened with sugar, and has a distinctive conical shape. The maalu leaf wrapping imparts a unique aroma to this delicacy.",
+    "ingredients": [
+      "grated coconut",
+      "khoya",
+      "powdered sugar",
+      "cardamom powder",
+      "ghee",
+      "maalu leaves (for wrapping)"
+    ],
+    "recipe": [
+      "Mix grated coconut, crumbled khoya, and powdered sugar together thoroughly.",
+      "Add cardamom powder and a little ghee, knead into a smooth mixture.",
+      "Take small portions and shape them into conical forms.",
+      "Wrap each piece in a fresh maalu leaf, folding the leaf to secure it.",
+      "Refrigerate for an hour to set before serving."
+    ],
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Harela",
+    "tag": "festival",
+    "description": "Harela is a popular festival of Uttarakhand celebrated during the onset of the monsoon season, typically in the month of Shravan (July-August). The festival symbolises the arrival of greenery and new crops. People sow seeds of seven grains in small baskets ten days before the festival, and the sprouted seedlings are placed on heads as a blessing on the festival day.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Phool Dei",
+    "tag": "festival",
+    "description": "Phool Dei is a spring festival celebrated in Uttarakhand during the month of Chaitra (March-April). Young girls collect fresh flowers and place them on the doorsteps of homes with a special preparation called dei made from jaggery, flour, and curd. It marks the arrival of spring and is a prayer for prosperity and well-being.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Ghee Sankranti",
+    "tag": "festival",
+    "description": "Ghee Sankranti, also known as Olgia, is celebrated on the first day of the month of Bhado (mid-August) in Uttarakhand. It marks the beginning of the harvest season when fresh ghee from newly calved cows is available. People eat ghee-based dishes and share freshly made ghee with neighbours as a symbol of abundance.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Nainital",
+    "tag": "tourism",
+    "description": "Nainital is a picturesque hill station in the Kumaon region of Uttarakhand, situated around the pear-shaped Naini Lake at an altitude of about 1,938 metres. It is one of the most popular tourist destinations in North India, known for its scenic beauty, pleasant climate, and colonial-era charm. Key attractions include the Mall Road, Snow View Point, Naina Devi Temple, and Tiffin Top.",
+    "location": "Nainital District",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Mussoorie",
+    "tag": "tourism",
+    "description": "Mussoorie, fondly called the Queen of Hills, is a popular hill station in Dehradun district of Uttarakhand at an elevation of about 2,005 metres. Established as a British colonial retreat, it offers stunning views of the Shivalik ranges and the Doon Valley. Key attractions include Kempty Falls, Gun Hill, Lal Tibba, and the historic Landour area.",
+    "location": "Dehradun District",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Rishikesh",
+    "tag": "tourism",
+    "description": "Rishikesh is a holy city on the banks of the river Ganga in Dehradun district, known as the Yoga Capital of the World. It is a gateway to the Char Dham pilgrimage and a hub for adventure sports including white-water rafting, bungee jumping, and trekking. The Beatles' visit to Maharishi Mahesh Yogi's ashram in 1968 brought it international fame.",
+    "location": "Dehradun District",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Valley of Flowers",
+    "tag": "tourism",
+    "description": "The Valley of Flowers National Park is a UNESCO World Heritage Site located in the Chamoli district of Uttarakhand. Nestled at an altitude of 3,658 metres, it is home to over 600 species of flowering plants, including the rare Brahma Kamal and Blue Poppy. The valley was discovered by British mountaineer Frank Smythe in 1931 and is accessible only by a trek from Govindghat.",
+    "location": "Chamoli District",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Jim Corbett National Park",
+    "tag": "wildlife",
+    "description": "Jim Corbett National Park, established in 1936 as Hailey National Park, is India's oldest national park and a premier destination for wildlife enthusiasts. Located in the Nainital district, it spans over 520 sq km and is home to Bengal tigers, Asian elephants, leopards, and over 600 species of birds. It is named after the legendary hunter-turned-conservationist Jim Corbett.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Rajaji National Park",
+    "tag": "wildlife",
+    "description": "Rajaji National Park is a national park and tiger reserve spread across the Shivalik range in the districts of Haridwar, Dehradun, and Pauri Garhwal. It was named after C. Rajagopalachari and covers about 820 sq km. The park is known for its population of Asian elephants, Bengal tigers, leopards, and king cobras, and sits at the confluence of the Indo-Gangetic plains and the Himalayan foothills.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Kedarnath Wildlife Sanctuary",
+    "tag": "wildlife",
+    "description": "Kedarnath Wildlife Sanctuary is one of the largest protected areas in the western Himalayas, spread over 975 sq km in the Chamoli and Rudraprayag districts. It is home to the endangered musk deer, Himalayan tahr, snow leopard, and the Himalayan monal. The sanctuary encompasses the famous Kedarnath Temple and is known for its alpine meadows, glaciers, and dense forests.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Kumaoni Holi",
+    "tag": "culture",
+    "description": "Kumaoni Holi is a unique form of Holi celebration in the Kumaon region that spans several weeks and includes Baithki Holi (sitting Holi), Khari Holi (standing Holi), and the final Charadi Holi. Unlike the rest of India, Kumaoni Holi is centred around classical and folk music, with groups of people singing traditional Holi songs with ragas appropriate to the time of day.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Aipan Art",
+    "tag": "culture",
+    "description": "Aipan is a traditional folk art of the Kumaon region, created by painting intricate geometric and ritualistic patterns on walls, floors, and cloth using a paste of rice flour on a red ochre background. This art form is an integral part of religious ceremonies, weddings, and festivals. Aipan designs include motifs of deities, the sacred swastika, fish, and floral patterns.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Pahari Culture",
+    "tag": "culture",
+    "description": "Pahari culture refers to the collective traditions, customs, and lifestyle of the hill people of Uttarakhand, encompassing both the Garhwali and Kumaoni communities. It is characterised by a deep connection to nature, communal living, unique architectural styles using stone and wood, and a rich oral tradition of folklore, songs, and stories passed down through generations.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Chholiya",
+    "tag": "dance",
+    "description": "Chholiya is a traditional sword dance performed during wedding processions in the Kumaon region of Uttarakhand. The dancers, dressed in colourful traditional attire with elaborate turbans, perform energetic mock sword fights to the rhythm of dhol and damau drums. This martial dance form dates back to the Rajput era and symbolises the warrior tradition of the Kumaoni people.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Langvir Nritya",
+    "tag": "dance",
+    "description": "Langvir Nritya is a daring acrobatic dance performed exclusively by men in the Garhwal region of Uttarakhand. Dancers perform breathtaking stunts and somersaults while standing on the shoulders of other performers, sometimes reaching heights of four to five human levels. This ancient dance requires immense physical strength and is performed during religious fairs and festivals.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Pandav Nritya",
+    "tag": "dance",
+    "description": "Pandav Nritya is a ritualistic dance drama performed in the Garhwal region of Uttarakhand that narrates episodes from the Mahabharata, particularly the stories of the five Pandava brothers. Performed over several nights, it combines dance, music, and dramatic storytelling. The performers enter a trance-like state believed to invoke the spirits of the Pandavas.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Hudka Drum",
+    "tag": "music",
+    "description": "The Hudka (also called Hurkiya) is a traditional hourglass-shaped drum that is central to folk music in the Kumaon region. It is played by a specialist musician known as a Hurkiya, who accompanies agricultural work, religious ceremonies, and folk narratives. The instrument produces a deep, resonant sound and is traditionally made from hollowed wood with animal skin stretched over both ends.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Mangal Geet",
+    "tag": "music",
+    "description": "Mangal Geet are auspicious songs sung during wedding ceremonies and other celebratory occasions in Uttarakhand. These traditional songs are passed down through generations and vary between the Garhwali and Kumaoni communities. They narrate stories of love, matrimony, blessings, and the beauty of the Himalayan homeland, typically sung by women in groups.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Jagar Tradition",
+    "tag": "music",
+    "description": "Jagar is a form of spirit worship and musical invocation practised in both Garhwal and Kumaon regions of Uttarakhand. A Jagariya (performer) plays traditional instruments and sings ballads to invoke local deities or ancestor spirits into a medium called Dangaria. The Jagar tradition serves as a means of seeking divine guidance, resolving disputes, and healing the sick.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Garhwal Kingdom",
+    "tag": "history",
+    "description": "The Garhwal Kingdom was a historic kingdom in the western part of present-day Uttarakhand, ruled by the Panwar dynasty from the 9th century until the British annexation in 1815. The capital was at Srinagar (Garhwal) and later at Tehri. The kingdom played a significant role in the cultural and political history of the central Himalayas and was known for its patronage of art, architecture, and temple building.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Kumaon Kingdom",
+    "tag": "history",
+    "description": "The Kumaon Kingdom, ruled by the Chand dynasty from the 7th to the 18th century, was a powerful kingdom in the eastern part of present-day Uttarakhand with its capital at Champawat and later Almora. The Chand rulers built numerous temples, promoted trade, and established a sophisticated administrative system. The kingdom fell to the Gorkhas in 1790 before being liberated by the British in 1815.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Tehri State",
+    "tag": "history",
+    "description": "Tehri State (also called Tehri Garhwal) was a princely state in the western Himalayas that existed from 1815 until its merger with the Indian Union in 1949. It was ruled by the Panwar dynasty from their capital at Tehri (now submerged under Tehri Dam). The last king, Manvendra Shah, signed the instrument of accession to India, and the state became part of Uttar Pradesh before being included in the new state of Uttarakhand in 2000.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Kedarnath Temple",
+    "tag": "temple",
+    "description": "Kedarnath Temple is one of the twelve Jyotirlingas and a part of the Char Dham pilgrimage circuit, located at an elevation of 3,583 metres in the Rudraprayag district. Built in the 8th century by Adi Shankaracharya, the stone temple withstood the devastating 2013 Uttarakhand floods. It is dedicated to Lord Shiva and is accessible only by a 16 km trek from Gaurikund or by helicopter.",
+    "location": "Rudraprayag District",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Badrinath Temple",
+    "tag": "temple",
+    "description": "Badrinath Temple, situated at 3,133 metres in the Chamoli district, is one of the Char Dhams and one of the 108 Divya Desams of Lord Vishnu. The colourful temple was established by Adi Shankaracharya and is dedicated to Lord Vishnu in his form as Badrinarayan. The nearby Tapt Kund hot spring and the Neelkanth peak provide a dramatic Himalayan backdrop.",
+    "location": "Chamoli District",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Jageshwar Dham",
+    "tag": "temple",
+    "description": "Jageshwar is an ancient temple complex of over 125 stone temples dating back to the 7th-12th centuries, located in a narrow valley in the Almora district. Surrounded by dense deodar forests, it is one of the twelve Jyotirlingas according to some traditions. The complex showcases exquisite examples of Nagara-style temple architecture and is a protected monument under the Archaeological Survey of India.",
+    "location": "Almora District",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Tungnath Temple",
+    "tag": "temple",
+    "description": "Tungnath is the highest Shiva temple in the world, situated at an altitude of 3,680 metres in the Rudraprayag district. It is one of the Panch Kedar temples and is believed to be over 1,000 years old. The temple is reached by a scenic 3.5 km trek from Chopta and offers breathtaking views of the Himalayan peaks including Nanda Devi, Kedarnath, and Chaukhamba.",
+    "location": "Rudraprayag District",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Roopkund Trek",
+    "tag": "adventure",
+    "description": "Roopkund is a high-altitude glacial lake at 5,029 metres in the Chamoli district, famous for the hundreds of ancient human skeletal remains visible at its shores. The trek to Roopkund is one of India's most popular and challenging treks, passing through dense forests, alpine meadows like Bedni Bugyal, and offering panoramic views of Trishul and Nanda Ghunti peaks.",
+    "location": "Chamoli District",
+    "difficulty": "Difficult",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Kedarkantha Trek",
+    "tag": "adventure",
+    "description": "Kedarkantha is a popular winter trek in the Govind Wildlife Sanctuary of the Uttarkashi district, reaching a summit of 3,810 metres. Known for its stunning snow-covered trails, frozen lakes, and panoramic Himalayan views, it is considered one of the best beginner-friendly winter treks in India. The trail passes through pine and oak forests with campsites at Juda Ka Talab and the base camp.",
+    "location": "Uttarkashi District",
+    "difficulty": "Moderate",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Rishikesh River Rafting",
+    "tag": "adventure",
+    "description": "White-water river rafting on the Ganga in Rishikesh is one of the most thrilling adventure activities in Uttarakhand. The rafting stretches range from 9 km to 36 km, starting from points like Shivpuri, Marine Drive, and Brahmpuri, with rapids graded from Grade I to Grade IV. The season runs from September to June, attracting thousands of adventure seekers from around the world.",
+    "location": "Dehradun District",
+    "difficulty": "Easy",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Dehradun",
+    "tag": "district",
+    "description": "Dehradun is the capital city of Uttarakhand and the headquarters of the Dehradun district, nestled in the Doon Valley between the Himalayan foothills and the Shivalik range. It is home to prestigious institutions like the Indian Military Academy, Forest Research Institute, and Doon School. The city serves as a gateway to popular hill stations Mussoorie and Chakrata and the holy cities of Haridwar and Rishikesh.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Chamoli",
+    "tag": "district",
+    "description": "Chamoli is a district in the Garhwal division of Uttarakhand, known for its spectacular Himalayan landscape and rich cultural heritage. It is home to the famous Badrinath Temple, Valley of Flowers National Park, and Hemkund Sahib. The district encompasses some of the highest peaks in India including Nanda Devi (7,816 m) and Kamet (7,756 m).",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Pithoragarh",
+    "tag": "district",
+    "description": "Pithoragarh is the easternmost district of Uttarakhand, often called Little Kashmir for its scenic beauty. It shares borders with Nepal and Tibet (China) and serves as the gateway to the Kailash-Mansarovar Yatra. The district is known for the Pithoragarh Fort, Dharchula, and the Askot Wildlife Sanctuary, and has a rich cultural heritage influenced by both Kumaoni and Shauka traditions.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Sunderlal Bahuguna",
+    "tag": "personality",
+    "description": "Sunderlal Bahuguna (1927-2021) was a renowned environmentalist and Gandhian activist from Uttarakhand who led the famous Chipko Movement in the 1970s. He dedicated his life to the preservation of Himalayan forests and opposed the construction of the Tehri Dam. His efforts brought global attention to environmental conservation in the Himalayas and he was awarded the Padma Vibhushan in 2009.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Gaura Devi",
+    "tag": "personality",
+    "description": "Gaura Devi (1925-1991) was a village woman from Lata village in the Chamoli district who became an icon of the Chipko Movement. In March 1974, she led a group of 27 women to confront loggers and hugged the trees to prevent them from being felled in the Reni forest. Her courageous act is considered a pivotal moment in India's environmental movement.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Govind Ballabh Pant",
+    "tag": "personality",
+    "description": "Govind Ballabh Pant (1887-1961) was a freedom fighter and statesman from Almora in the Kumaon region of Uttarakhand. He served as the first Chief Minister of Uttar Pradesh and later as the Home Minister of India. He was awarded the Bharat Ratna in 1957 and played a key role in establishing Hindi as the official language of India.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Garhwali Language",
+    "tag": "language",
+    "description": "Garhwali is an Indo-Aryan language spoken by the people of the Garhwal region of Uttarakhand. It belongs to the Central Pahari group of languages and has several dialects including Srinagari, Tehri, and Badani. While Hindi is the official language, Garhwali remains the primary spoken language in rural areas and has a rich tradition of folk songs, poetry, and oral literature.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Kumaoni Language",
+    "tag": "language",
+    "description": "Kumaoni is an Indo-Aryan language spoken in the Kumaon region of Uttarakhand. It has several dialects such as Khasparjia, Johari, Danpuriya, and Askoti. Kumaoni has a rich literary heritage with notable poets like Gumani Pant and Krishnanand Vageesh. The language is closely related to Garhwali and Nepali, and has been classified as a vulnerable language by UNESCO.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Jaunsari Language",
+    "tag": "language",
+    "description": "Jaunsari is a Western Pahari language spoken by the Jaunsari people in the Jaunsar-Bawar region of Dehradun district. The community maintains distinct cultural practices including polyandrous marriage traditions and unique festivals. Jaunsari has limited written literature but a vibrant oral tradition of folk tales, songs, and the Harul dance tradition.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Ringaal Craft",
+    "tag": "craft",
+    "description": "Ringaal craft is a traditional bamboo weaving art practised in the Garhwal and Kumaon regions of Uttarakhand. Ringaal, a type of hill bamboo (Arundinaria), is used to make baskets, mats, rain shields (ghumta), and decorative items. This sustainable craft has been practised for centuries by artisan communities and is now being promoted as an eco-friendly alternative to plastic products.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Aipan Craft",
+    "tag": "craft",
+    "description": "Aipan is a traditional decorative art form of the Kumaon region used to adorn floors, walls, and ceremonial spaces. Created using rice paste on a red ochre base, Aipan designs feature geometric patterns, deity motifs, and nature-inspired symbols. This craft has been given a GI (Geographical Indication) tag and is now being adapted onto textiles, pottery, and paper products for wider markets.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Thulma Weaving",
+    "tag": "craft",
+    "description": "Thulma is a traditional handloom weaving craft practised by the Bhotiya community in the higher Himalayan regions of Uttarakhand, particularly in Chamoli and Pithoragarh districts. Weavers use the wool of local sheep and angora goats to create warm shawls, blankets, and carpets with distinctive geometric patterns. The craft is an important source of livelihood in remote mountain villages.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Brahma Kamal",
+    "tag": "flora",
+    "description": "Brahma Kamal (Saussurea obvallata) is the state flower of Uttarakhand and a rare high-altitude flowering plant found above 4,500 metres in the Himalayas. It blooms once a year, usually between July and September, and is considered sacred in Hindu mythology. The flower is associated with Lord Brahma and is offered at the Kedarnath Temple. It is classified as an endangered species.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Buransh",
+    "tag": "flora",
+    "description": "Buransh (Rhododendron arboreum) is the state tree of Uttarakhand, found abundantly between 1,500 and 3,600 metres in the Himalayan forests. Its vibrant red flowers bloom from February to April, carpeting the hillsides in crimson. The flower petals are used to make a traditional juice and squash that is believed to have medicinal properties, including benefits for heart and liver health.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Deodar Cedar",
+    "tag": "flora",
+    "description": "Deodar Cedar (Cedrus deodara) is a majestic coniferous tree native to the western Himalayas, found extensively in the forests of Uttarakhand between 1,500 and 3,200 metres. The name derives from the Sanskrit devadaru meaning timber of the gods. Deodar wood is highly valued for its durability, aromatic quality, and resistance to decay, and has been used traditionally in temple construction.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Himalayan Monal",
+    "tag": "fauna",
+    "description": "The Himalayan Monal (Lophophorus impejanus) is the state bird of Uttarakhand, found in the alpine and subalpine zones between 2,400 and 4,500 metres. The male monal is renowned for its iridescent plumage of metallic green, purple, blue, and copper colours. It feeds on insects, tubers, and seeds, and is a symbol of the rich biodiversity of the Himalayan region.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Snow Leopard",
+    "tag": "fauna",
+    "description": "The Snow Leopard (Panthera uncia) is an elusive big cat found in the high-altitude regions of Uttarakhand above 3,000 metres, particularly in the Nanda Devi Biosphere Reserve and the Gangotri National Park. It is classified as Vulnerable by the IUCN and is estimated to have a population of around 80-100 individuals in Uttarakhand. Conservation efforts include community-based programs in remote villages.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "Musk Deer",
+    "tag": "fauna",
+    "description": "The Himalayan Musk Deer (Moschus leucogaster) is an endangered species found in the dense forests of Uttarakhand between 2,500 and 4,300 metres. It is a small, solitary, and shy animal known for the musk gland in males, which has been highly valued in traditional medicine and perfumery. The Kedarnath Wildlife Sanctuary and Askot Wildlife Sanctuary are key habitats for this species in the state.",
+    "source": "seed",
+    "created_at": "2026-06-18T00:00:00"
+  },
+  {
+    "name": "France",
+    "tag": "district",
+    "description": "List of districts of Uttarakhand The Uttarakhand state of India, in Himalayas mountain range, has 13 districts.[1] History [edit]In November 2000 when Uttarakhand was created as a new state from the larger Uttar Pradesh state, it had inherited 13 districts. Since then, no new districts have been created even though other newly created states have almost doubled the number of new districts for rapid development.[1] District administration [edit]A district of Uttarakhand state is an administrative geographical unit, headed by a District Magistrate (earlier called District Collector), an officer belonging to the Indian Administrative Service. The district magistrates are assisted by a number of officers such as deputy collector, assistant collector, additional district magistrate, sub-divisional magistrate, tehsildar, naib tehsildar belonging to the Uttarakhand Civil Service and other Uttarakhand state services. A Superintendent of Police, an officer belonging to the Indian Police Service, heads the police in the district and is entrusted with the responsibility of maintaining law and order and related issues. He is assisted by the officers of the Uttarakhand Police Service. A Deputy Conservator of Forests, an officer belonging to the Indian Forest Service, is responsible for managing the Forests, environment and wild-life related issues of the district. He is assisted by the officers of the Uttarakhand Forest Service and other Uttarakhand forest officials and Uttarakhand wildlife officials. Sectoral development is looked after by the district head of each development department such as Public works, Health, Education, Agriculture, Animal husbandry, etc. These officers belong to the various Uttarakhand state services. List of districts [edit]| Code | District | Headquarters[2] | Formed | Population (As of 2011)[3] | Area (km2)[4] | Density (/km2) | Division | Map | |---|---|---|---|---|---|---|---|---| | AL | Almora | Almora | 621,972 | 3,083 | 201 | Kumaon | || | BA | Bageshwar | Bageshwar | 16 September 1997 | 259,840 | 2,302 | 113 | Kumaon | | | CL | Chamoli | Gopeshwar | 391,114 | 8,030 | 49 | Garhwal | || | CP | Champawat | Champawat | 16 September 1997 | 259,315 | 1,781 | 146 | Kumaon | | | DD | Dehradun | Dehradun | 1,695,860 | 3,088 | 550 | Garhwal | || | HA | Haridwar | Roshnabad | 28 December 1988 | 1,927,029 | 2,360 | 817 | Garhwal | | | NA | Nainital | Nainital | 955,128 | 3,860 | 247 | Kumaon | || | PG | Pauri Garhwal | Pauri | 686,572 | 5,399 | 127 | Garhwal | || | PI | Pithoragarh | Pithoragarh | 24 February 1960 | 485,993 | 7,100 | 68 | Kumaon | | | RP | Rudraprayag | Rudraprayag | 16 September 1997 | 236,857 | 1,890 | 125 | Garhwal | | | TG | Tehri Garhwal | Tehri | 616,409 | 4,080 | 151 | Garhwal | || | US | Udham Singh Nagar | Rudrapur | 29 September 1995 | 1,648,367 | 2,908 | 567 | Kumaon | | | UT | Uttarkashi | Uttarkashi | 24 February 1960 | 329,686 | 8,016 | 41 | Garhwal | Proposals for new districts [edit]The creation of new administrative districts in Uttarakhand has been a recurring political and administrative topic. In 2011, the state government announced plans to create four new districts: Yamunotri, Kotdwar, Ranikhet, and Didihat. However, these were not implemented due to subsequent changes in government.[1][5] In 2016, a subsequent administration expanded this proposal to nine districts, incorporating the previous four alongside Rishikesh, Roorkee, Ramnagar, Kashipur, and Sitarganj-Khatima. As of present, these announcements have not been formally notified.[1] In addition to these state-level announcements, local representatives and leaders continuously petition for further decentralized administrative units to address challenges related to mountainous terrain, geographic isolation, and public service accessibility. | Proposed District | Proposed HQ | Expected Area of Jurisdiction | Rationale / Status | |---|---|---|---| | Proposed from Dehradun | ||| | Tiuni | Tyuni (Tiuni) | Remote mountainous tracts of Dehradun district. | Proposed by local elected representatives to improve administrative reach. | | Chakrata | Chakrata | Chakrata sub-division of Dehradun district. | Proposed by elected representatives to cater to the distinct geographic and demographic needs of the region. | | Proposed from Haridwar | ||| | Roorkee | Roorkee | Roorkee sub-division and surrounding areas in Haridwar district. | Announced as part of the 2016 state government proposal for new districts. | | Proposed from Uttarkashi | ||| | Yamunotri | Yamunotri | Yamunotri valley and surrounding sub-divisions of Uttarkashi district. | Announced in 2011 and reiterated in 2016 state government proposals. | | Gangotri | Gangotri | Gangotri and Purola tehsils of Uttarkashi district. | Proposed by local representatives for decentralized governance in the high-altitude border region. | | Proposed from Chamoli | ||| | Ghastoli | Ghastoli | Kalindi Pass area and northern tracts of Chamoli district. | Proposed to…",
+    "source": "web_scrape",
+    "source_url": "https://en.wikipedia.org/wiki/List_of_districts_of_Uttarakhand",
+    "search_query": "France district Uttarakhand",
+    "created_at": "2026-06-18T09:18:51.003580+00:00"
+  },
+  {
+    "name": "gi tags",
+    "tag": "tourism",
+    "description": "Uttarakhand Uttarakhand is the 1st state in the country to get maximum 18 GI tags in a single day - 07 Dec 2023 - 3 min read Why in News? On December 4, 2023, Uttarakhand became the 1st state in the country to get GI certificates for a maximum of 18 products in a single day. Chief Minister Pushkar Singh Dhami distributed GI certificates in a program organized at Chief Sevak Sadan located at the Chief Minister's residence. Key Points: - Till now, a total of 27 products of Uttarakhand have received GI tag. - The 18 products of the state which have received GI (geographical Indication) certificates include Uttarakhand Chola, Jhangora, Mandua, Red Rice, Almora Lakhori Chilli, Berinag Tea, Burans Sharbat, Ramnagar (Nainital) litchi, Ramgarh Aadu, Malta, Pahari Tor, Gahath, Kalah Bhatt, Bichhubati Fabric, Nainital Mangbatti, Rangoli Pichoda, Chamoli Raman Masks and Kitai Wood Carving. - It may be noted that 9 products of Uttarakhand - Tejpat, Basmati rice, Aipan art, Munsiyari white kidney beans, Ringal craft, Thulma, Bhotiya dan, Chura oil and copper products have already received GI certificate. - For the 1st time in the 20-year journey from the enactment of the GI law in 2003 to 2023, GI certificates have been issued to 18 products of a state simultaneously in a single day. - The Chief Minister has expressed hope that the export of GI tagged products from Uttarakhand will increase rapidly. - The Chief Minister said that with the aim of promoting local products in all the 13 districts of the state, work on the 'One District, Two Products' scheme is going on at a fast pace. - The main objective of the scheme is to identify the local products in all the districts and develop traditional industries accordingly. Due to this, self-employment opportunities are increasing for local farmers & craftsmen and local products of every district are getting world class recognition. - Describing this as an important achievement, Agriculture and Horticulture Minister Ganesh Joshi said that a state level GI Tag Mahotsav will be organised in Dehradun from January 12 to 18, 2024.",
+    "source": "web_scrape",
+    "source_url": "https://www.drishtiias.com/state-pcs-current-affairs/uttarakhand-is-the-state-in-the-country-to-get-maximum-18-tags-in-a-single-day",
+    "search_query": "gi tags tourism Uttarakhand",
+    "created_at": "2026-06-18T09:58:03.602996+00:00"
+  }
+]
