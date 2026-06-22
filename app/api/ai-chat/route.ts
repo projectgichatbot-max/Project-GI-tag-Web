@@ -1,143 +1,406 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { getDatabaseService } from "@/lib/database-service-fixed"
+/**
+ * app/api/ai-chat/route.ts
+ *
+ * Full port of the Python uttarakhand_chatbot FastAPI service into a
+ * Next.js API route — 100% Vercel-compatible, no Python sidecar needed.
+ *
+ * Intent flow (mirrors main.py):
+ *   1. Cache lookup  (in-memory, 24 h TTL)
+ *   2. Greeting detection
+ *   3. LIST_GI_TAGS  — "list all gi tags", "show all", etc.
+ *   4. TAG_DETAILS   — fuzzy-match a product name  (score ≥ 80)
+ *   5. RECIPE_QUERY  — same fuzzy match + recipe keywords
+ *   6. Rejection     — "Not a valid Uttarakhand GI Tag query."
+ */
 
+import { type NextRequest, NextResponse } from "next/server"
+import Fuse from "fuse.js"
+import GI_PRODUCTS_RAW from "@/uttarakhand_chatbot/data/master_gi_dataset.json"
+
+// ─────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────
+interface GIRecord {
+  name: string
+  category: string
+  region: string
+  description: string
+  uses: string[]
+  examples: string[]
+  ingredients: string[]
+  recipe: string[]
+  registration: string
+  recipe_title: string
+  recipe_description: string
+}
+
+const products = GI_PRODUCTS_RAW as GIRecord[]
+
+// ─────────────────────────────────────────────
+// In-memory cache (24 h TTL, mirrors cache_manager.py)
+// ─────────────────────────────────────────────
+interface CacheEntry {
+  response: string
+  tag: string | null
+  timestamp: number
+}
+
+const responseCache = new Map<string, CacheEntry>()
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000
+
+function cacheGet(key: string): CacheEntry | null {
+  const entry = responseCache.get(key)
+  if (!entry) return null
+  if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+    responseCache.delete(key)
+    return null
+  }
+  return entry
+}
+
+function cacheSet(key: string, response: string, tag: string | null): void {
+  responseCache.set(key, { response, tag, timestamp: Date.now() })
+}
+
+// ─────────────────────────────────────────────
+// Filler-word stripping (mirrors intent_detector.py → clean_filler_words)
+// ─────────────────────────────────────────────
+const FILLER_PREFIXES = [
+  "can you tell me about ",
+  "give me information on ",
+  "traditional recipe of ",
+  "steps to prepare ",
+  "information about ",
+  "give details of ",
+  "steps to make ",
+  "dishes made with ",
+  "dishes using ",
+  "food made using ",
+  "food made with ",
+  "ingredients of ",
+  "details about ",
+  "info about ",
+  "details of ",
+  "tell me of ",
+  "info on ",
+  "information on ",
+  "details on ",
+  "query about ",
+  "query for ",
+  "recipe of ",
+  "recipe for ",
+  "recepie of ",
+  "recepie for ",
+  "recipie of ",
+  "recipie for ",
+  "how to use ",
+  "how to cook ",
+  "how can i ",
+  "how about ",
+  "tell about ",
+  "how is ",
+  "how are ",
+  "how do you ",
+  "how to ",
+  "how can ",
+  "steps to ",
+  "tell me about ",
+  "what is ",
+  "what are ",
+  "describe ",
+  "show me ",
+]
+
+function cleanFillerWords(query: string): string {
+  let q = query.toLowerCase().replace(/[^\w\s]/g, "").trim()
+  for (const prefix of FILLER_PREFIXES) {
+    if (q.startsWith(prefix)) {
+      q = q.slice(prefix.length).trim()
+      break
+    }
+  }
+  return q
+    .replace(/\s+be\s+used\s+in\s+cooking$/, "")
+    .replace(/\s+used\s+in\s+cooking$/, "")
+    .replace(/\s+in\s+cooking$/, "")
+    .replace(/\s+made$/, "")
+    .replace(/\s+prepared$/, "")
+    .replace(/\s+please$/, "")
+    .replace(/\s+thanks$/, "")
+    .trim()
+}
+
+// ─────────────────────────────────────────────
+// Name aliases (mirrors _get_match_candidates in intent_detector.py)
+// ─────────────────────────────────────────────
+function getMatchCandidates(name: string): string[] {
+  const n = name.toLowerCase()
+  const candidates: string[] = [n]
+
+  if (n.startsWith("uttarakhand ")) {
+    candidates.push(n.slice("uttarakhand ".length).trim())
+  }
+
+  const parenMatches = n.match(/\(([^)]+)\)/g) || []
+  for (const m of parenMatches) {
+    candidates.push(m.replace(/[()]/g, "").trim())
+  }
+  const noParens = n.replace(/\(.*?\)/g, "").replace(/\s+/g, " ").trim()
+  candidates.push(noParens)
+  if (noParens.startsWith("uttarakhand ")) {
+    candidates.push(noParens.slice("uttarakhand ".length).trim())
+  }
+
+  if (n.includes("tejpat")) candidates.push("tejpatta", "tej patta", "tejpat", "tej pata")
+  if (n.includes("ringaal") || n.includes("ringal")) candidates.push("ringal craft", "ringal", "ringaal")
+  if (n.includes("bal mithai") || n.includes("bal mitai")) candidates.push("bal mitai", "bal mithai")
+  if (n.includes("munsyari") || n.includes("munsiyari")) candidates.push("munsiyari rajma", "munsyari rajma", "munsiyari", "mungsiyari rajma")
+  if (n.includes("bichhu") || n.includes("bichu")) candidates.push("bichhu buti", "bichu buti", "nettle fabric")
+  if (n.includes("lakhori")) candidates.push("lakhori mirchi", "lakhori")
+  if (n.includes("berinag")) candidates.push("berinag tea", "berinag")
+  if (n.includes("chiura") || n.includes("chyura")) candidates.push("chiura", "chyura", "chiura oil", "chyura oil")
+  if (n.includes("tamta")) candidates.push("copper products", "tamta craft", "tamta")
+  if (n.includes("pichhoda") || n.includes("pichora")) candidates.push("pichhoda", "pichora", "rangwali pichora")
+  if (n.includes("mombatti") || n.includes("candle")) candidates.push("candle", "nainital mombatti", "mombatti")
+  if (n.includes("likhai")) candidates.push("likhai", "wood carving")
+
+  return [...new Set(candidates)]
+}
+
+// ─────────────────────────────────────────────
+// Fuzzy matching (equivalent to rapidfuzz)
+// ─────────────────────────────────────────────
+function fuseScore(query: string, candidate: string): number {
+  const f = new Fuse([{ name: candidate }], {
+    keys: ["name"],
+    threshold: 1.0,
+    includeScore: true,
+    ignoreLocation: true,
+  })
+  const results = f.search(query)
+  if (!results.length) return 0
+  return (1 - (results[0].score ?? 1)) * 100
+}
+
+function fuzzyMatchProduct(query: string): { record: GIRecord; score: number } | null {
+  const cleaned = cleanFillerWords(query)
+  if (!cleaned) return null
+
+  let bestScore = 0
+  let bestRecord: GIRecord | null = null
+
+  for (const product of products) {
+    const candidates = getMatchCandidates(product.name)
+    for (const candidate of candidates) {
+      const score = Math.max(
+        fuseScore(cleaned, candidate),
+        fuseScore(query, candidate)
+      )
+      if (score > bestScore) {
+        bestScore = score
+        bestRecord = product
+      }
+    }
+  }
+
+  return bestScore >= 80 && bestRecord ? { record: bestRecord, score: bestScore } : null
+}
+
+// ─────────────────────────────────────────────
+// Intent Detection (mirrors main.py routing)
+// ─────────────────────────────────────────────
+const LIST_KEYWORDS = [
+  "list all", "show all", "give names", "what are the gi",
+  "list of", "list gi", "show gi", "get gi", "all gi",
+  "list the gi", "names of gi", "what are gi", "give all gi",
+]
+
+const RECIPE_KEYWORDS = [
+  "recipe", "recepie", "recipie", "recepe", "recipi",
+  "recipes", "recepies", "cook", "prepare", "ingredients",
+  "how to make", "how to cook", "steps", "how to use",
+  "used in cooking", "use in cooking",
+]
+
+const GREETING_KEYWORDS = [
+  "hello", "hi", "namaste", "hey", "greetings",
+  "good morning", "good evening", "good afternoon",
+]
+
+type Intent = "GREETING" | "LIST_GI_TAGS" | "TAG_DETAILS" | "RECIPE_QUERY" | "UNKNOWN"
+
+function detectIntent(lower: string): { intent: Intent; record: GIRecord | null } {
+  if (GREETING_KEYWORDS.some(kw => lower === kw || lower.startsWith(kw + " ") || lower.endsWith(" " + kw))) {
+    return { intent: "GREETING", record: null }
+  }
+
+  if (
+    LIST_KEYWORDS.some(kw => lower.includes(kw)) ||
+    ["list", "gi tags", "gi tags list", "show list"].includes(lower)
+  ) {
+    return { intent: "LIST_GI_TAGS", record: null }
+  }
+
+  const match = fuzzyMatchProduct(lower)
+  if (match) {
+    const isRecipe = RECIPE_KEYWORDS.some(kw => lower.includes(kw))
+    return { intent: isRecipe ? "RECIPE_QUERY" : "TAG_DETAILS", record: match.record }
+  }
+
+  return { intent: "UNKNOWN", record: null }
+}
+
+// ─────────────────────────────────────────────
+// Response Formatters (mirrors response_generator.py)
+// ─────────────────────────────────────────────
+function formatDetails(r: GIRecord): string {
+  const parts: string[] = [r.name]
+  parts.push("\nCategory:", r.category)
+  parts.push("\nRegion:", r.region)
+  parts.push("\nDescription:", r.description)
+
+  if (r.category === "Handicraft") {
+    if (r.uses.length) { parts.push("\nUses:"); r.uses.forEach(u => parts.push(`• ${u}`)) }
+    if (r.examples.length) { parts.push("\nExamples:"); r.examples.forEach(e => parts.push(`• ${e}`)) }
+  } else if (r.category === "Food Product") {
+    if (r.ingredients.length) { parts.push("\nIngredients:"); r.ingredients.forEach(i => parts.push(`• ${i}`)) }
+    if (r.recipe.length) { parts.push("\nRecipe:"); r.recipe.forEach((s, i) => parts.push(`${i + 1}. ${s}`)) }
+    if (r.uses.length) { parts.push("\nUses:"); r.uses.forEach(u => parts.push(`• ${u}`)) }
+  } else {
+    if (r.examples.length) { parts.push("\nCharacteristics:"); r.examples.forEach(e => parts.push(`• ${e}`)) }
+    if (r.uses.length) { parts.push("\nUses:"); r.uses.forEach(u => parts.push(`• ${u}`)) }
+  }
+
+  parts.push("\nGI Registration:", r.registration)
+  return parts.join("\n")
+}
+
+function formatRecipe(r: GIRecord): string {
+  const FOOD_CATS = ["Food Product", "Agricultural Product", "Spice Product", "Herbal Product"]
+  if (!FOOD_CATS.includes(r.category)) {
+    return "Recipes are only available for food-related GI products."
+  }
+  if (!r.recipe.length && !r.ingredients.length) {
+    return `No recipe is available for ${r.name}. Try asking "Tell me about ${r.name}" for general information.`
+  }
+
+  const displayName = r.name.startsWith("Uttarakhand ") ? r.name.slice("Uttarakhand ".length) : r.name
+  const parts: string[] = [r.recipe_title || `Recipe: ${r.name}`]
+  parts.push("\nGI Product:", displayName)
+  parts.push("\nRegion:", r.region)
+  parts.push("\nDescription:", r.recipe_description || r.description)
+
+  if (r.ingredients.length) { parts.push("\nIngredients:"); r.ingredients.forEach(i => parts.push(`• ${i}`)) }
+  if (r.recipe.length) { parts.push("\nPreparation Steps:"); r.recipe.forEach((s, i) => parts.push(`${i + 1}. ${s}`)) }
+  if (r.uses.length) { parts.push("\nUses:"); r.uses.forEach(u => parts.push(`• ${u}`)) }
+  parts.push("\nTraditional Significance:", r.description)
+  return parts.join("\n")
+}
+
+function formatList(): string {
+  const names = products
+    .filter(p => p.name !== "Bal Mithai")
+    .map((p, i) => `${i + 1}. ${p.name}`)
+    .join("\n")
+  return `GI Tags of Uttarakhand\n\n${names}`
+}
+
+function greetingResponse(): string {
+  return [
+    "Namaste! 🙏 I'm your AI assistant for Uttarakhand's GI-tagged products.",
+    "",
+    "You can ask me:",
+    "• About any GI product (e.g., \"Tell me about Aipan Art\")",
+    "• Recipes (e.g., \"Recipe of Jhangora\")",
+    "• \"List all GI tags\" to see all 27 registered products",
+    "",
+    "How can I help you today?",
+  ].join("\n")
+}
+
+// ─────────────────────────────────────────────
+// Main processor
+// ─────────────────────────────────────────────
+function processMessage(message: string): { response: string; tag: string | null } {
+  const lower = message.trim().toLowerCase()
+
+  // 1. Cache lookup
+  const cached = cacheGet(lower)
+  if (cached) return { response: cached.response, tag: cached.tag }
+
+  // 2. Intent routing
+  const { intent, record } = detectIntent(lower)
+
+  let response: string
+  let tag: string | null = null
+
+  if (intent === "GREETING") {
+    response = greetingResponse()
+
+  } else if (intent === "LIST_GI_TAGS") {
+    response = formatList()
+    tag = "LIST_GI_TAGS"
+    cacheSet(lower, response, tag)
+
+  } else if (intent === "TAG_DETAILS" && record) {
+    response = formatDetails(record)
+    tag = record.category
+    cacheSet(lower, response, tag)
+
+  } else if (intent === "RECIPE_QUERY" && record) {
+    response = formatRecipe(record)
+    tag = record.category
+    cacheSet(lower, response, tag)
+
+  } else {
+    response = [
+      "Not a valid Uttarakhand GI Tag query.",
+      "",
+      "Try asking:",
+      "• \"Tell me about Berinag Tea\"",
+      "• \"Recipe of Mandua\"",
+      "• \"List all GI tags of Uttarakhand\"",
+      "• \"What is Aipan Art?\"",
+    ].join("\n")
+  }
+
+  return { response, tag }
+}
+
+// ─────────────────────────────────────────────
+// Route handlers
+// ─────────────────────────────────────────────
 export async function POST(request: NextRequest) {
   try {
-    const { message, conversationId } = await request.json()
-    
-    if (!message) {
-      return NextResponse.json(
-        { success: false, error: "Message is required" },
-        { status: 400 }
-      )
+    const body = await request.json()
+    const { message, conversationId } = body
+
+    if (!message || typeof message !== "string") {
+      return NextResponse.json({ success: false, error: "Message is required" }, { status: 400 })
     }
-    
-    // Get database service
-    const db = await getDatabaseService()
-    
-    // Process the message and generate response
-    const response = await processAIMessage(message, db)
-    
+
+    const { response, tag } = processMessage(message)
+
     return NextResponse.json({
       success: true,
       data: {
         message: response,
+        tag,
         conversationId: conversationId || `conv-${Date.now()}`,
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     })
   } catch (error) {
-    console.error('AI Chat error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to process message' },
-      { status: 500 }
-    )
+    console.error("AI Chat error:", error)
+    return NextResponse.json({ success: false, error: "Failed to process message" }, { status: 500 })
   }
 }
 
-async function processAIMessage(message: string, db: any): Promise<string> {
-  const lowerMessage = message.toLowerCase()
-  
-  // Handle greetings
-  if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('namaste')) {
-    return "Namaste! I'm your AI assistant for Uttarakhand's GI-tagged products. I can help you learn about traditional products, their health benefits, cultural significance, and connect you with artisans. What would you like to know?"
-  }
-  
-  // Handle product queries
-  if (lowerMessage.includes('product') || lowerMessage.includes('rajma') || lowerMessage.includes('aipan')) {
-    try {
-      const products = await db.getProducts({}, { page: 1, limit: 5 })
-      if (products.data && products.data.length > 0) {
-        const productList = products.data.map((p: any) => `• ${p.name} (${p.category}) - ${p.description}`).join('\n')
-        return `Here are some of our heritage products:\n\n${productList}\n\nEach product has unique health benefits and cultural significance. Would you like to know more about any specific product?`
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error)
-    }
-    
-    return "We have amazing heritage products like Munsiyari Rajma (organic kidney beans) and Aipan Art (traditional geometric patterns). Each product carries deep cultural significance and health benefits. What specific product interests you?"
-  }
-  
-  // Handle artisan queries
-  if (lowerMessage.includes('artisan') || lowerMessage.includes('craftsman') || lowerMessage.includes('maker')) {
-    try {
-      const artisans = await db.getArtisans({}, { page: 1, limit: 3 })
-      if (artisans.data && artisans.data.length > 0) {
-        const artisanList = artisans.data.map((a: any) => `• ${a.name} - ${a.specialization} from ${a.village}`).join('\n')
-        return `Meet our talented artisans:\n\n${artisanList}\n\nThese skilled craftspeople preserve traditional techniques passed down through generations. Would you like to learn about their workshops or techniques?`
-      }
-    } catch (error) {
-      console.error('Error fetching artisans:', error)
-    }
-    
-    return "Our artisans are master craftspeople who preserve traditional techniques. They offer workshops and share their knowledge about organic farming, traditional arts, and cultural heritage. Would you like to know about specific artisans or their workshops?"
-  }
-  
-  // Handle health benefits queries
-  if (lowerMessage.includes('health') || lowerMessage.includes('benefit') || lowerMessage.includes('nutrition')) {
-    return "Our heritage products offer incredible health benefits! For example:\n\n• Munsiyari Rajma: High protein (22g/100g), rich in iron and calcium, diabetic-friendly\n• Traditional foods: Grown organically, free from chemicals, packed with nutrients\n• Cultural practices: Many traditional preparation methods enhance nutritional value\n\nWould you like to know about specific health benefits of any product?"
-  }
-  
-  // Handle cultural significance queries
-  if (lowerMessage.includes('culture') || lowerMessage.includes('tradition') || lowerMessage.includes('heritage')) {
-    return "Our products are deeply rooted in Uttarakhand's culture:\n\n• Munsiyari Rajma: Sacred food offered in temples, traditional festival staple\n• Aipan Art: Sacred geometric patterns for spiritual protection and prosperity\n• Each product carries stories of generations and cultural practices\n\nThese products connect you to centuries of tradition and wisdom. What aspect of the culture interests you most?"
-  }
- 
-  // Handle GI Tag count / references for Uttarakhand
-  if (lowerMessage.includes('gi tag') || lowerMessage.includes('gi-tag') || lowerMessage.includes('geographical indication')) {
-    const mentionsCount = lowerMessage.includes('how many') || lowerMessage.includes('total') || lowerMessage.includes('count')
-    const countLine = `As of now, Uttarakhand has 27 registered GI tags.`
-    const refs = `References:\n• DPIIT GI Registry (IP India): https://search.ipindia.gov.in/GIRPublic/\n• DPIIT GI Official Portal: https://dpiit.gov.in/gi` 
-    if (mentionsCount) {
-      return `${countLine}\n\n${refs}\n\nYou can ask me about any specific GI product to learn more.`
-    }
-    return `Geographical Indications (GI) protect traditional products and their origin. Uttarakhand currently has 27 registered GI tags.\n\n${refs}\n\nWhich product would you like to explore?`
-  }
-  
-  // Handle search queries
-  if (lowerMessage.includes('search') || lowerMessage.includes('find') || lowerMessage.includes('look for')) {
-    try {
-      const searchResults = await db.search(message.replace(/search|find|look for/gi, '').trim(), 'all', 5)
-      if (searchResults.products.length > 0 || searchResults.artisans.length > 0) {
-        let response = "Here's what I found:\n\n"
-        if (searchResults.products.length > 0) {
-          response += "Products:\n" + searchResults.products.map((p: any) => `• ${p.name} - ${p.description}`).join('\n') + "\n\n"
-        }
-        if (searchResults.artisans.length > 0) {
-          response += "Artisans:\n" + searchResults.artisans.map((a: any) => `• ${a.name} - ${a.specialization}`).join('\n')
-        }
-        return response
-      }
-    } catch (error) {
-      console.error('Error searching:', error)
-    }
-    
-    return "I'd be happy to help you search! Try asking about specific products like 'Munsiyari Rajma' or 'Aipan Art', or ask about artisans and their specializations."
-  }
-  
-  // Handle help queries
-  if (lowerMessage.includes('help') || lowerMessage.includes('what can you do')) {
-    return "I can help you with:\n\n• Learn about heritage products and their benefits\n• Connect with traditional artisans\n• Understand cultural significance\n• Find health benefits of traditional foods\n• Search for specific products or artisans\n• Answer questions about Uttarakhand's heritage\n\nJust ask me anything about our products, artisans, or cultural heritage!"
-  }
-  
-  // Fallback: try semantic search for anything not matched above
-  try {
-    const results = await db.search(message, 'all', 5)
-    if ((results.products && results.products.length) || (results.artisans && results.artisans.length)) {
-      let out = "Here are relevant results I found:\n\n"
-      if (results.products?.length) {
-        out += "Products:\n" + results.products.map((p: any) => `• ${p.name} (${p.category}) — ${p.region || ''}\n  /products/${p._id || p.id || ''}`).join('\n') + "\n\n"
-      }
-      if (results.artisans?.length) {
-        out += "Artisans:\n" + results.artisans.map((a: any) => `• ${a.name} — ${a.specialization || ''} ${a.village ? 'from ' + a.village : ''}\n  /artisans/${a._id || a.id || ''}`).join('\n')
-      }
-      out += "\n\nAsk me for details on any item above."
-      return out
-    }
-  } catch (e) {
-    console.error('Fallback search failed', e)
-  }
-
-  // Final default
-  return "I'm here to help you learn about Uttarakhand's rich cultural heritage. Ask about a product (e.g., 'Munsiyari Rajma benefits'), an artisan (e.g., 'Ringaal artisan'), or say 'GI tags of Uttarakhand'."
+export async function GET() {
+  return NextResponse.json({
+    service: "uttarakhand-gi-chatbot",
+    status: "ok",
+    products_loaded: products.length,
+    timestamp: new Date().toISOString(),
+  })
 }
