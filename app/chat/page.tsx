@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { 
   Send, Mic, MicOff, Trash2, Bot, User, 
   Sparkles, Globe, Info, Landmark
@@ -59,6 +58,7 @@ export default function ChatPage() {
   const [recognition, setRecognition] = useState<any>(null)
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -106,9 +106,12 @@ export default function ChatPage() {
     }
   }, [])
 
-  // Auto-scroll to bottom of messages
+  // Auto-scroll to bottom of messages (scrolls the container, not the page)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    const container = messagesContainerRef.current
+    if (container) {
+      container.scrollTop = container.scrollHeight
+    }
   }, [messages, isLoading])
 
   const handleSendMessage = async (textToSend?: string) => {
@@ -248,7 +251,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen pt-16 bg-[#0B0F19] text-white flex flex-col lg:flex-row">
+    <div className="h-screen overflow-hidden pt-16 bg-[#0B0F19] text-white flex flex-col lg:flex-row">
       {/* Left Sidebar - Desktop only */}
       <aside className="w-full lg:w-80 bg-[#111827] border-b lg:border-b-0 lg:border-r border-slate-800 p-6 flex flex-col gap-6 select-none">
         <div>
@@ -280,7 +283,7 @@ export default function ChatPage() {
         <div className="mt-auto hidden lg:flex flex-col gap-4 border-t border-slate-800 pt-4">
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Info className="h-4 w-4 text-slate-500" />
-            <span>Powered by Next.js API</span>
+            <span>Powered by Uttarakhand Heritage</span>
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Landmark className="h-4 w-4 text-slate-500" />
@@ -318,7 +321,10 @@ export default function ChatPage() {
         </div>
 
         {/* Message Area */}
-        <ScrollArea className="flex-1 px-4 md:px-8 py-6">
+        <div
+          ref={messagesContainerRef}
+          className="flex-1 overflow-y-auto px-4 md:px-8 py-6 scroll-smooth"
+        >
           <div className="max-w-4xl mx-auto space-y-6">
             {messages.map((msg) => (
               <div 
@@ -416,7 +422,7 @@ export default function ChatPage() {
             
             <div ref={messagesEndRef} />
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Input area & suggestions */}
         <div className="p-4 md:p-6 border-t border-slate-800 bg-[#0F172A]">

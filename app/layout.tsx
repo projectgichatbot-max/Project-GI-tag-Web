@@ -4,7 +4,6 @@ import { Inter, Playfair_Display } from "next/font/google"
 import "./globals.css"
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
-import { AIChatbot } from "@/components/ai-chatbot-fixed"
 import { Toaster } from "@/components/ui/sonner"
 
 const inter = Inter({
@@ -41,7 +40,6 @@ export default function RootLayout({
         <Navigation />
         <main>{children}</main>
         <Footer />
-        <AIChatbot />
         <Toaster />
       </body>
     </html>
