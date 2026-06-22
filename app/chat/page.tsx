@@ -74,6 +74,10 @@ export default function ChatPage() {
   const [langMenuOpen, setLangMenuOpen] = useState(false)
   const langMenuRef = useRef<HTMLDivElement>(null)
 
+  // Typewriter effect state
+  const [streamingMsgId, setStreamingMsgId] = useState<string | null>(null)
+  const [streamedContent, setStreamedContent] = useState<Record<string, string>>({})
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null) // always holds the current recognition instance
@@ -147,6 +151,23 @@ export default function ChatPage() {
     initRecognition(selectedLang)
   }, [selectedLang, initRecognition])
 
+  // ── Typewriter effect for bot messages ─────────────────────────────
+  useEffect(() => {
+    if (!streamingMsgId) return
+    const fullContent = messages.find(m => m.id === streamingMsgId)?.content || ""
+    let idx = 0
+    const interval = setInterval(() => {
+      idx = Math.min(idx + 8, fullContent.length)
+      setStreamedContent(prev => ({ ...prev, [streamingMsgId]: fullContent.slice(0, idx) }))
+      if (idx >= fullContent.length) {
+        clearInterval(interval)
+        setStreamingMsgId(null)
+      }
+    }, 15)
+    return () => clearInterval(interval)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [streamingMsgId])
+
   // ── Auto-scroll (scrolls container, NOT the page) ────────────────────
   useEffect(() => {
     const container = messagesContainerRef.current
@@ -189,9 +210,9 @@ export default function ChatPage() {
     try {
       // 2. Translate user input to English (if not already English)
       let queryInEnglish = text
-      if (selectedLang.code !== "en") {
+      if (selectedLang.translationCode !== "en") {
         setIsTranslating(true)
-        queryInEnglish = await translateText(text, selectedLang.code, "en")
+        queryInEnglish = await translateText(text, selectedLang.translationCode, "en")
         setIsTranslating(false)
       }
 
@@ -200,17 +221,18 @@ export default function ChatPage() {
 
       // 4. Translate English response back to user's language
       let finalResponse = data.response
-      if (selectedLang.code !== "en") {
+      if (selectedLang.translationCode !== "en") {
         setIsTranslating(true)
-        finalResponse = await translateText(data.response, "en", selectedLang.code)
+        finalResponse = await translateText(data.response, "en", selectedLang.translationCode)
         setIsTranslating(false)
       }
 
-      // 5. Display translated response
+      // 5. Display translated response with typewriter effect
+      const botMsgId = (Date.now() + 1).toString()
       setMessages((prev) => [
         ...prev,
         {
-          id: (Date.now() + 1).toString(),
+          id: botMsgId,
           role: "bot",
           content: finalResponse,
           timestamp: new Date(),
@@ -220,6 +242,9 @@ export default function ChatPage() {
           langCode: selectedLang.code,
         }
       ])
+      // Trigger typewriter — reveal progressively
+      setStreamedContent(prev => ({ ...prev, [botMsgId]: "" }))
+      setStreamingMsgId(botMsgId)
     } catch (error: any) {
       setIsTranslating(false)
       console.error("Chat error:", error)
@@ -364,6 +389,12 @@ export default function ChatPage() {
               </button>
             ))}
           </div>
+          {/* Dialect note */}
+          {selectedLang.note && (
+            <p className="mt-2 text-[10px] text-amber-500/80 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2 py-1.5 leading-relaxed">
+              ⚠️ {selectedLang.note} — typing in Devanagari script will work best.
+            </p>
+          )}
         </div>
 
         {/* Popular GI Tags */}
@@ -522,9 +553,13 @@ export default function ChatPage() {
 
                   <div className="space-y-1">
                     {msg.role === "bot" && !msg.error
-                      ? formatBotMessage(msg.content)
+                      ? formatBotMessage(streamedContent[msg.id] ?? msg.content)
                       : <p className="text-sm md:text-base whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                     }
+                    {/* Blinking cursor during typewriter */}
+                    {streamingMsgId === msg.id && (
+                      <span className="inline-block w-0.5 h-4 bg-amber-400 animate-pulse ml-0.5 align-middle" />
+                    )}
                   </div>
 
                   {/* Metadata: source tag */}

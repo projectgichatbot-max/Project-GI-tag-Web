@@ -1,25 +1,7 @@
-/**
- * app/api/ai-chat/route.ts
- *
- * Full port of the Python uttarakhand_chatbot FastAPI service into a
- * Next.js API route — 100% Vercel-compatible, no Python sidecar needed.
- *
- * Intent flow (mirrors main.py):
- *   1. Cache lookup  (in-memory, 24 h TTL)
- *   2. Greeting detection
- *   3. LIST_GI_TAGS  — "list all gi tags", "show all", etc.
- *   4. TAG_DETAILS   — fuzzy-match a product name  (score ≥ 80)
- *   5. RECIPE_QUERY  — same fuzzy match + recipe keywords
- *   6. Rejection     — "Not a valid Uttarakhand GI Tag query."
- */
-
-import { type NextRequest, NextResponse } from "next/server"
+﻿import { type NextRequest, NextResponse } from "next/server"
 import Fuse from "fuse.js"
 import GI_PRODUCTS_RAW from "@/uttarakhand_chatbot/data/master_gi_dataset.json"
 
-// ─────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────
 interface GIRecord {
   name: string
   category: string
@@ -36,9 +18,6 @@ interface GIRecord {
 
 const products = GI_PRODUCTS_RAW as GIRecord[]
 
-// ─────────────────────────────────────────────
-// In-memory cache (24 h TTL, mirrors cache_manager.py)
-// ─────────────────────────────────────────────
 interface CacheEntry {
   response: string
   tag: string | null
@@ -62,9 +41,6 @@ function cacheSet(key: string, response: string, tag: string | null): void {
   responseCache.set(key, { response, tag, timestamp: Date.now() })
 }
 
-// ─────────────────────────────────────────────
-// Filler-word stripping (mirrors intent_detector.py → clean_filler_words)
-// ─────────────────────────────────────────────
 const FILLER_PREFIXES = [
   "can you tell me about ",
   "give me information on ",
@@ -130,9 +106,9 @@ function cleanFillerWords(query: string): string {
     .trim()
 }
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Name aliases (mirrors _get_match_candidates in intent_detector.py)
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function getMatchCandidates(name: string): string[] {
   const n = name.toLowerCase()
   const candidates: string[] = [n]
@@ -167,9 +143,6 @@ function getMatchCandidates(name: string): string[] {
   return [...new Set(candidates)]
 }
 
-// ─────────────────────────────────────────────
-// Fuzzy matching (equivalent to rapidfuzz)
-// ─────────────────────────────────────────────
 function fuseScore(query: string, candidate: string): number {
   const f = new Fuse([{ name: candidate }], {
     keys: ["name"],
@@ -206,9 +179,6 @@ function fuzzyMatchProduct(query: string): { record: GIRecord; score: number } |
   return bestScore >= 80 && bestRecord ? { record: bestRecord, score: bestScore } : null
 }
 
-// ─────────────────────────────────────────────
-// Intent Detection (mirrors main.py routing)
-// ─────────────────────────────────────────────
 const LIST_KEYWORDS = [
   "list all", "show all", "give names", "what are the gi",
   "list of", "list gi", "show gi", "get gi", "all gi",
@@ -250,9 +220,6 @@ function detectIntent(lower: string): { intent: Intent; record: GIRecord | null 
   return { intent: "UNKNOWN", record: null }
 }
 
-// ─────────────────────────────────────────────
-// Response Formatters (mirrors response_generator.py)
-// ─────────────────────────────────────────────
 function formatDetails(r: GIRecord): string {
   const parts: string[] = [r.name]
   parts.push("\nCategory:", r.category)
@@ -260,15 +227,15 @@ function formatDetails(r: GIRecord): string {
   parts.push("\nDescription:", r.description)
 
   if (r.category === "Handicraft") {
-    if (r.uses.length) { parts.push("\nUses:"); r.uses.forEach(u => parts.push(`• ${u}`)) }
-    if (r.examples.length) { parts.push("\nExamples:"); r.examples.forEach(e => parts.push(`• ${e}`)) }
+    if (r.uses.length) { parts.push("\nUses:"); r.uses.forEach(u => parts.push(`â€¢ ${u}`)) }
+    if (r.examples.length) { parts.push("\nExamples:"); r.examples.forEach(e => parts.push(`â€¢ ${e}`)) }
   } else if (r.category === "Food Product") {
-    if (r.ingredients.length) { parts.push("\nIngredients:"); r.ingredients.forEach(i => parts.push(`• ${i}`)) }
+    if (r.ingredients.length) { parts.push("\nIngredients:"); r.ingredients.forEach(i => parts.push(`â€¢ ${i}`)) }
     if (r.recipe.length) { parts.push("\nRecipe:"); r.recipe.forEach((s, i) => parts.push(`${i + 1}. ${s}`)) }
-    if (r.uses.length) { parts.push("\nUses:"); r.uses.forEach(u => parts.push(`• ${u}`)) }
+    if (r.uses.length) { parts.push("\nUses:"); r.uses.forEach(u => parts.push(`â€¢ ${u}`)) }
   } else {
-    if (r.examples.length) { parts.push("\nCharacteristics:"); r.examples.forEach(e => parts.push(`• ${e}`)) }
-    if (r.uses.length) { parts.push("\nUses:"); r.uses.forEach(u => parts.push(`• ${u}`)) }
+    if (r.examples.length) { parts.push("\nCharacteristics:"); r.examples.forEach(e => parts.push(`â€¢ ${e}`)) }
+    if (r.uses.length) { parts.push("\nUses:"); r.uses.forEach(u => parts.push(`â€¢ ${u}`)) }
   }
 
   parts.push("\nGI Registration:", r.registration)
@@ -290,9 +257,9 @@ function formatRecipe(r: GIRecord): string {
   parts.push("\nRegion:", r.region)
   parts.push("\nDescription:", r.recipe_description || r.description)
 
-  if (r.ingredients.length) { parts.push("\nIngredients:"); r.ingredients.forEach(i => parts.push(`• ${i}`)) }
+  if (r.ingredients.length) { parts.push("\nIngredients:"); r.ingredients.forEach(i => parts.push(`â€¢ ${i}`)) }
   if (r.recipe.length) { parts.push("\nPreparation Steps:"); r.recipe.forEach((s, i) => parts.push(`${i + 1}. ${s}`)) }
-  if (r.uses.length) { parts.push("\nUses:"); r.uses.forEach(u => parts.push(`• ${u}`)) }
+  if (r.uses.length) { parts.push("\nUses:"); r.uses.forEach(u => parts.push(`â€¢ ${u}`)) }
   parts.push("\nTraditional Significance:", r.description)
   return parts.join("\n")
 }
@@ -307,35 +274,93 @@ function formatList(): string {
 
 function greetingResponse(): string {
   return [
-    "Namaste! 🙏 I'm your AI assistant for Uttarakhand's GI-tagged products.",
+    "Namaste! ðŸ™ I'm your AI assistant for Uttarakhand's GI-tagged products.",
     "",
     "You can ask me:",
-    "• About any GI product (e.g., \"Tell me about Aipan Art\")",
-    "• Recipes (e.g., \"Recipe of Jhangora\")",
-    "• \"List all GI tags\" to see all 27 registered products",
+    "â€¢ About any GI product (e.g., \"Tell me about Aipan Art\")",
+    "â€¢ Recipes (e.g., \"Recipe of Jhangora\")",
+    "â€¢ \"List all GI tags\" to see all 27 registered products",
     "",
     "How can I help you today?",
   ].join("\n")
 }
 
-// ─────────────────────────────────────────────
-// Main processor
-// ─────────────────────────────────────────────
-function processMessage(message: string): { response: string; tag: string | null } {
+interface ScrapeResult {
+  content: string
+  sourceUrl: string
+}
+
+async function scrapeWikipedia(subject: string): Promise<ScrapeResult | null> {
+  try {
+    const searchQuery = `${subject} Uttarakhand`
+
+    const searchUrl =
+      `https://en.wikipedia.org/w/api.php` +
+      `?action=opensearch&search=${encodeURIComponent(searchQuery)}` +
+      `&limit=1&namespace=0&format=json`
+
+    const searchRes = await fetch(searchUrl, {
+      headers: { "User-Agent": "UttarakhandGI-Chatbot/1.0 (Vercel; educational)" },
+      signal: AbortSignal.timeout(6000),
+    })
+    if (!searchRes.ok) return null
+
+    const [, titles, , urls]: [string, string[], string[], string[]] = await searchRes.json()
+    if (!titles?.[0]) return null
+
+    const summaryUrl =
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(titles[0])}`
+
+    const summaryRes = await fetch(summaryUrl, {
+      headers: { "User-Agent": "UttarakhandGI-Chatbot/1.0 (Vercel; educational)" },
+      signal: AbortSignal.timeout(6000),
+    })
+    if (!summaryRes.ok) return null
+
+    const summary = await summaryRes.json()
+    const extract: string = summary?.extract || ""
+
+    const lowerExtract = extract.toLowerCase()
+    const relevant =
+      lowerExtract.includes("uttarakhand") ||
+      lowerExtract.includes("india") ||
+      lowerExtract.includes("himalaya") ||
+      lowerExtract.includes("kumaon") ||
+      lowerExtract.includes("garhwal")
+
+    if (!extract || !relevant) return null
+
+    const pageUrl: string =
+      summary?.content_urls?.desktop?.page ||
+      urls?.[0] ||
+      `https://en.wikipedia.org/wiki/${encodeURIComponent(titles[0])}`
+
+    return { content: extract, sourceUrl: pageUrl }
+  } catch {
+    return null
+  }
+}
+
+async function processMessage(
+  message: string
+): Promise<{ response: string; tag: string | null; source?: string; source_url?: string }> {
   const lower = message.trim().toLowerCase()
 
-  // 1. Cache lookup
+ 
   const cached = cacheGet(lower)
-  if (cached) return { response: cached.response, tag: cached.tag }
+  if (cached) return { response: cached.response, tag: cached.tag, source: "cache" }
 
-  // 2. Intent routing
+  
   const { intent, record } = detectIntent(lower)
 
-  let response: string
+  let response = ""
   let tag: string | null = null
+  let source: string | undefined
+  let source_url: string | undefined
 
   if (intent === "GREETING") {
     response = greetingResponse()
+    tag = "GREETING"
 
   } else if (intent === "LIST_GI_TAGS") {
     response = formatList()
@@ -345,31 +370,48 @@ function processMessage(message: string): { response: string; tag: string | null
   } else if (intent === "TAG_DETAILS" && record) {
     response = formatDetails(record)
     tag = record.category
+    source = "knowledge_base"
     cacheSet(lower, response, tag)
 
   } else if (intent === "RECIPE_QUERY" && record) {
     response = formatRecipe(record)
     tag = record.category
+    source = "knowledge_base"
     cacheSet(lower, response, tag)
 
   } else {
-    response = [
-      "Not a valid Uttarakhand GI Tag query.",
-      "",
-      "Try asking:",
-      "• \"Tell me about Berinag Tea\"",
-      "• \"Recipe of Mandua\"",
-      "• \"List all GI tags of Uttarakhand\"",
-      "• \"What is Aipan Art?\"",
-    ].join("\n")
+  
+    const cleanQuery = cleanFillerWords(lower) || lower
+    const scraped = await scrapeWikipedia(cleanQuery)
+
+    if (scraped) {
+      response = [
+        `Here is what I found about "${cleanQuery}":`,
+        "",
+        scraped.content,
+        "",
+        "âš ï¸ This information is from Wikipedia, not the official GI tag knowledge base.",
+      ].join("\n")
+      tag = "web_scrape"
+      source = "web_scrape"
+      source_url = scraped.sourceUrl
+      cacheSet(lower, response, tag)
+    } else {
+      response = [
+        "Not a valid Uttarakhand GI Tag query.",
+        "",
+        "Try asking:",
+        "â€¢ \"Tell me about Berinag Tea\"",
+        "â€¢ \"Recipe of Mandua\"",
+        "â€¢ \"List all GI tags of Uttarakhand\"",
+        "â€¢ \"What is Aipan Art?\"",
+      ].join("\n")
+    }
   }
 
-  return { response, tag }
+  return { response, tag, source, source_url }
 }
 
-// ─────────────────────────────────────────────
-// Route handlers
-// ─────────────────────────────────────────────
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -379,13 +421,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Message is required" }, { status: 400 })
     }
 
-    const { response, tag } = processMessage(message)
+    const { response, tag, source, source_url } = await processMessage(message)
 
     return NextResponse.json({
       success: true,
       data: {
         message: response,
         tag,
+        source,
+        source_url,
         conversationId: conversationId || `conv-${Date.now()}`,
         timestamp: new Date().toISOString(),
       },

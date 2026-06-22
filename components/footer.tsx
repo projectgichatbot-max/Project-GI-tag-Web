@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Mail, Phone, MapPin, Facebook, Instagram, Youtube, Heart, Award, Leaf, Loader2, CheckCircle2 } from "lucide-react"
+import { Mail, Phone, MapPin, Linkedin, Instagram, Youtube, Heart, Award, Leaf, Loader2, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { toast } from "sonner"
@@ -107,16 +107,16 @@ export function Footer() {
             {/* Social Links */}
             <div className="flex flex-wrap gap-2">
               <a
-                href="https://facebook.com"
+                href="https://www.linkedin.com/in/uttarakhand-heritage-42a7403a8/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="h-10 w-10 rounded-full bg-[#1877F2] hover:bg-[#166FE5] flex items-center justify-center transition-colors duration-200"
-                aria-label="Facebook"
+                className="h-10 w-10 rounded-full bg-[#0A66C2] hover:bg-[#004182] flex items-center justify-center transition-colors duration-200"
+                aria-label="LinkedIn"
               >
-                <Facebook className="h-5 w-5 text-white" />
+                <Linkedin className="h-5 w-5 text-white" />
               </a>
               <a
-                href="https://x.com"
+                href="https://x.com/uttarakhand_0"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="h-10 w-10 rounded-full bg-black hover:bg-gray-900 flex items-center justify-center transition-colors duration-200 border border-white/20"
@@ -132,7 +132,7 @@ export function Footer() {
                 </svg>
               </a>
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/uttarakhand_heritage0/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 flex items-center justify-center transition-all duration-200"
@@ -141,7 +141,7 @@ export function Footer() {
                 <Instagram className="h-5 w-5 text-white" />
               </a>
               <a
-                href="https://youtube.com"
+                href="https://www.youtube.com/@UttarakhandHeritage"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="h-10 w-10 rounded-full bg-[#FF0000] hover:bg-[#CC0000] flex items-center justify-center transition-colors duration-200"

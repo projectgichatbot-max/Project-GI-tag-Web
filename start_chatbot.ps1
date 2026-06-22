@@ -1,7 +1,3 @@
-# start_chatbot.ps1
-# Helper script to set up the Python venv and start the FastAPI chatbot server locally.
-# LOCAL DEVELOPMENT ONLY — on Vercel the chatbot runs via app/api/ai-chat/route.ts
-
 $chatbotDir = Join-Path $PSScriptRoot "uttarakhand_chatbot"
 $venvDir    = Join-Path $chatbotDir "venv"
 $pip        = Join-Path $venvDir "Scripts\pip.exe"
