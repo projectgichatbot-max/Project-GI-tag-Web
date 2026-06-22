@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { MessageCircle, Mic, MicOff, Send, Bot, User, Volume2, X, Minimize2, Maximize2 } from "lucide-react"
 
 interface Message {
@@ -36,6 +35,7 @@ export function AIChatbot() {
   const [isLoading, setIsLoading] = useState(false)
   const [recognition, setRecognition] = useState<any>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   // Initialize speech recognition
   useEffect(() => {
@@ -79,9 +79,11 @@ export function AIChatbot() {
     }
   }, [])
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom (scroll container, not the page)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight
+    }
   }, [messages])
 
   const handleSendMessage = async (message?: string, isVoice = false) => {
@@ -221,7 +223,7 @@ export function AIChatbot() {
 
       {!isMinimized && (
         <CardContent className="p-0 flex flex-col h-[calc(100%-4rem)] bg-slate-900">
-          <ScrollArea className="flex-1 p-4">
+          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4">
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
@@ -270,8 +272,7 @@ export function AIChatbot() {
                 </div>
               )}
             </div>
-            <div ref={messagesEndRef} />
-          </ScrollArea>
+          </div>
 
           <div className="p-4 border-t border-slate-800">
             <div className="flex items-center space-x-2">
@@ -291,7 +292,7 @@ export function AIChatbot() {
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyPress}
                 placeholder="Ask about heritage products, artisans, or culture..."
                 className="flex-1 bg-slate-800 border-slate-700 text-white placeholder:text-slate-400"
                 disabled={isLoading}
