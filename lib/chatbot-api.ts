@@ -1,3 +1,10 @@
+/**
+ * lib/chatbot-api.ts
+ *
+ * Client-side helper that calls the Next.js /api/ai-chat route.
+ * Works on localhost AND on Vercel — no Python server needed.
+ */
+
 export interface ChatbotResponse {
   response: string
   tag: string | null
@@ -5,15 +12,12 @@ export interface ChatbotResponse {
   source_url?: string | null
 }
 
-const BACKEND_URL = "http://localhost:8001/chat"
+// Always use a relative URL so it works on localhost AND on Vercel
+const CHAT_ENDPOINT = "/api/ai-chat"
 
 /**
- * Sends a chat query to the Uttarakhand Chatbot backend.
+ * Sends a chat query to the Next.js AI chat API route.
  * Implements client-side timeout and automatic retries with exponential backoff.
- *
- * @param query The question string to send.
- * @param options Configurations for timeout and max retries.
- * @returns A promise resolving to ChatbotResponse.
  */
 export async function sendChatQuery(
   query: string,
@@ -21,7 +25,7 @@ export async function sendChatQuery(
 ): Promise<ChatbotResponse> {
   const { timeoutMs = 15000, maxRetries = 3 } = options
   let attempt = 0
-  let delay = 1000 // Initial backoff delay (1 second)
+  let delay = 1000
 
   while (attempt < maxRetries) {
     attempt++
@@ -29,26 +33,39 @@ export async function sendChatQuery(
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
 
     try {
-      const response = await fetch(BACKEND_URL, {
+      const response = await fetch(CHAT_ENDPOINT, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ query }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: query }),
         signal: controller.signal,
       })
 
       clearTimeout(timeoutId)
 
       if (response.ok) {
-        return await response.json()
+        const json = await response.json()
+
+        // Our /api/ai-chat route returns: { success, data: { message, tag, ... } }
+        // Map it to the ChatbotResponse shape the chat page expects
+        if (json.success && json.data) {
+          return {
+            response: json.data.message,
+            tag: json.data.tag ?? null,
+            source: "knowledge_base",
+            source_url: null,
+          }
+        }
+
+        // Fallback — direct shape (shouldn't happen but just in case)
+        if (json.response) return json as ChatbotResponse
+
+        throw new Error(json.error || "Unexpected response format")
       }
 
-      // If server error (5xx), we retry. Otherwise we throw.
       if (response.status >= 500) {
-        console.warn(`Chatbot API returned server error ${response.status}. Attempt ${attempt} of ${maxRetries}.`)
+        console.warn(`Chatbot API server error ${response.status}. Attempt ${attempt}/${maxRetries}.`)
         if (attempt >= maxRetries) {
-          throw new Error(`Server returned error ${response.status}: ${response.statusText}`)
+          throw new Error(`Server error ${response.status}: ${response.statusText}`)
         }
       } else {
         const errText = await response.text().catch(() => "")
@@ -58,19 +75,17 @@ export async function sendChatQuery(
       clearTimeout(timeoutId)
 
       const isAbort = err.name === "AbortError"
-      const isNetwork = err instanceof TypeError // fetch throws TypeError on network issues
-      const isServerError = err.message && err.message.includes("Server returned error")
+      const isNetwork = err instanceof TypeError
+      const isServerError = err.message?.includes("Server error")
 
       if ((isAbort || isNetwork || isServerError) && attempt < maxRetries) {
-        console.warn(`Chatbot query attempt ${attempt} failed: ${err.message || err}. Retrying in ${delay}ms...`)
+        console.warn(`Chatbot query attempt ${attempt} failed: ${err.message}. Retrying in ${delay}ms...`)
         await new Promise((resolve) => setTimeout(resolve, delay))
-        delay *= 2 // Exponential backoff
+        delay *= 2
         continue
       }
 
-      if (isAbort) {
-        throw new Error(`Request timed out after ${timeoutMs / 1000} seconds.`)
-      }
+      if (isAbort) throw new Error(`Request timed out after ${timeoutMs / 1000}s.`)
       throw err
     }
   }

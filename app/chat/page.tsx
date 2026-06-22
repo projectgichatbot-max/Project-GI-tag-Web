@@ -280,7 +280,7 @@ export default function ChatPage() {
         <div className="mt-auto hidden lg:flex flex-col gap-4 border-t border-slate-800 pt-4">
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Info className="h-4 w-4 text-slate-500" />
-            <span>Runs locally on Port 8001</span>
+            <span>Powered by Next.js API</span>
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Landmark className="h-4 w-4 text-slate-500" />
