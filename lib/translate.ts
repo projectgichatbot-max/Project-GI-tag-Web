@@ -36,7 +36,7 @@ export const DEFAULT_LANGUAGE = SUPPORTED_LANGUAGES[0] // English
  * Returns original text on failure so the chat never breaks.
  *
  * @param text   Text to translate
- * @param from   translationCode of source language (e.g. "hi")
+ * @param from   translationCode of source language (e.g. "hi"), or "auto" to auto-detect
  * @param to     translationCode of target language (e.g. "en")
  */
 export async function translateText(
@@ -44,8 +44,11 @@ export async function translateText(
   from: string,
   to: string
 ): Promise<string> {
-  // No-op: same language or empty text
-  if (!text.trim() || from === to) return text
+  // No-op: empty text
+  if (!text.trim()) return text
+
+  // No-op: same explicit language (skip for "auto" since we don't know the real source yet)
+  if (from !== "auto" && from === to) return text
 
   try {
     const res = await fetch("/api/translate", {

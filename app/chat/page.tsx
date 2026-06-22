@@ -209,10 +209,12 @@ export default function ChatPage() {
 
     try {
       // 2. Translate user input to English (if not already English)
+      //    Use "auto" source — lets Google detect the actual script the user typed in.
+      //    This handles cases where user types Hindi text with Gujarati language selected etc.
       let queryInEnglish = text
       if (selectedLang.translationCode !== "en") {
         setIsTranslating(true)
-        queryInEnglish = await translateText(text, selectedLang.translationCode, "en")
+        queryInEnglish = await translateText(text, "auto", "en")
         setIsTranslating(false)
       }
 
