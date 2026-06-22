@@ -389,12 +389,6 @@ export default function ChatPage() {
               </button>
             ))}
           </div>
-          {/* Dialect note */}
-          {selectedLang.note && (
-            <p className="mt-2 text-[10px] text-amber-500/80 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2 py-1.5 leading-relaxed">
-              ⚠️ {selectedLang.note} — typing in Devanagari script will work best.
-            </p>
-          )}
         </div>
 
         {/* Popular GI Tags */}

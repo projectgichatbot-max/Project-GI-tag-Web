@@ -1,4 +1,4 @@
-﻿import { type NextRequest, NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import Fuse from "fuse.js"
 import GI_PRODUCTS_RAW from "@/uttarakhand_chatbot/data/master_gi_dataset.json"
 
@@ -127,6 +127,7 @@ function getMatchCandidates(name: string): string[] {
     candidates.push(noParens.slice("uttarakhand ".length).trim())
   }
 
+  // ── GI-specific name aliases (standard short forms) ──────────────────────
   if (n.includes("tejpat")) candidates.push("tejpatta", "tej patta", "tejpat", "tej pata")
   if (n.includes("ringaal") || n.includes("ringal")) candidates.push("ringal craft", "ringal", "ringaal")
   if (n.includes("bal mithai") || n.includes("bal mitai")) candidates.push("bal mitai", "bal mithai")
@@ -139,6 +140,85 @@ function getMatchCandidates(name: string): string[] {
   if (n.includes("pichhoda") || n.includes("pichora")) candidates.push("pichhoda", "pichora", "rangwali pichora")
   if (n.includes("mombatti") || n.includes("candle")) candidates.push("candle", "nainital mombatti", "mombatti")
   if (n.includes("likhai")) candidates.push("likhai", "wood carving")
+
+  // ── English common-name aliases ─────────────────────────────────────────────
+  // These fix translation bugs: when users query in Hindi/Tamil/etc., Google
+  // Translate returns the common English name (e.g. "bay leaf" for तेज पत्ता)
+  // rather than the GI brand name ("Tejpatta"). Adding these aliases ensures
+  // the fuzzy matcher still finds the right product.
+  if (n.includes("tejpat")) {
+    candidates.push("bay leaf", "bay leaves", "indian bay leaf", "tejpat leaves",
+      "tej patta leaves", "cinnamomum tamala", "malabar leaf",
+      "tez patta", "tez pata", "tej pata leaves") // Urdu transliterations
+  }
+  if (n.includes("mandua")) {
+    candidates.push("finger millet", "ragi", "mandwa", "nachni", "mandua millet",
+      "eleusine coracana", "millet")
+  }
+  if (n.includes("jhangora")) {
+    candidates.push("barnyard millet", "sawa millet", "jungle rice", "echinochloa",
+      "japanese millet", "wild millet", "millet")
+  }
+  if (n.includes("bichhu") || n.includes("bichu")) {
+    candidates.push("nettle", "stinging nettle", "nettle fiber", "nettle fibre",
+      "nettle fabric", "urtica dioica", "himalayan nettle")
+  }
+  if (n.includes("chiura") || n.includes("chyura")) {
+    candidates.push("himalayan butter", "butter tree", "chyura butter",
+      "aesculus indica oil", "wild plum oil", "horse chestnut oil")
+  }
+  if (n.includes("munsyari") || n.includes("munsiyari")) {
+    candidates.push("rajma", "kidney beans", "red beans", "rajma beans",
+      "mountain kidney beans", "himalayan rajma")
+  }
+  if (n.includes("ringaal") || n.includes("ringal")) {
+    candidates.push("bamboo craft", "ringal basket", "himalayan bamboo",
+      "bamboo weaving", "bamboo products", "bamboo", "cane craft")
+  }
+  if (n.includes("aipan")) {
+    candidates.push("aipan", "kumaoni art", "ritual art", "floor painting",
+      "folk art", "folk painting", "rangoli", "aipan painting", "kumaon art")
+  }
+  if (n.includes("malta")) {
+    candidates.push("malta orange", "hill orange", "pahadi orange",
+      "pahadi malta", "mountain orange", "malta citrus", "citrus fruit")
+  }
+  if (n.includes("bal mithai") || n.includes("bal mitai")) {
+    candidates.push("sweet ball", "chocolate sweet", "indian sweet ball",
+      "mithai", "fudge ball", "candy ball", "traditional sweet")
+  }
+  if (n.includes("thulma")) {
+    candidates.push("woolen blanket", "hill blanket", "pahari blanket",
+      "traditional blanket", "wool blanket", "handmade blanket")
+  }
+  if (n.includes("lakhori")) {
+    candidates.push("small chili", "round chilli", "lakhori pepper",
+      "hill chilli", "mountain chili", "chili pepper")
+  }
+  if (n.includes("berinag")) {
+    candidates.push("organic tea", "green tea", "kumaon tea", "hill tea",
+      "tea", "black tea", "darjeeling style tea")
+  }
+  if (n.includes("tamta")) {
+    candidates.push("copper", "copper craft", "copper vessel", "copper pot",
+      "brassware", "copper utensil", "metal craft")
+  }
+  if (n.includes("basmati")) {
+    candidates.push("aromatic rice", "long grain rice", "scented rice",
+      "rice", "basmati")
+  }
+  if (n.includes("pichhoda") || n.includes("pichora")) {
+    candidates.push("traditional cloth", "ceremonial cloth", "pahari cloth",
+      "ritual cloth", "traditional saree", "kumaoni cloth")
+  }
+  if (n.includes("mombatti") || n.includes("candle")) {
+    candidates.push("wax candle", "handmade candle", "nainital candle",
+      "scented candle", "beeswax candle")
+  }
+  if (n.includes("likhai")) {
+    candidates.push("wood carving", "wood craft", "timber carving",
+      "wooden craft", "wood art", "carving")
+  }
 
   return [...new Set(candidates)]
 }

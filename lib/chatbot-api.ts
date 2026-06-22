@@ -51,8 +51,9 @@ export async function sendChatQuery(
           return {
             response: json.data.message,
             tag: json.data.tag ?? null,
-            source: "knowledge_base",
-            source_url: null,
+            // ✅ Read actual source + source_url from server (not hardcoded)
+            source: json.data.source || "knowledge_base",
+            source_url: json.data.source_url ?? null,
           }
         }
 
