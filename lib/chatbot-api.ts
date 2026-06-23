@@ -18,12 +18,17 @@ const CHAT_ENDPOINT = "/api/ai-chat"
 /**
  * Sends a chat query to the Next.js AI chat API route.
  * Implements client-side timeout and automatic retries with exponential backoff.
+ *
+ * @param query           The query text (in English, after translation).
+ * @param originalNative  The user's original text before translation (if any).
+ *                        Passed to the backend so it can fall back when the
+ *                        translated text is not valid English.
  */
 export async function sendChatQuery(
   query: string,
-  options: { timeoutMs?: number; maxRetries?: number } = {}
+  options: { timeoutMs?: number; maxRetries?: number; originalNative?: string } = {}
 ): Promise<ChatbotResponse> {
-  const { timeoutMs = 15000, maxRetries = 3 } = options
+  const { timeoutMs = 15000, maxRetries = 3, originalNative } = options
   let attempt = 0
   let delay = 1000
 
@@ -36,7 +41,10 @@ export async function sendChatQuery(
       const response = await fetch(CHAT_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: query }),
+        body: JSON.stringify({
+          message: query,
+          ...(originalNative ? { originalNative } : {}),
+        }),
         signal: controller.signal,
       })
 

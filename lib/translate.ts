@@ -3,30 +3,70 @@
  *
  * Language definitions and client-side translation helper.
  * Calls /api/translate (server-side proxy) to avoid CORS.
+ *
+ * Supported languages: English · Hindi · Marathi · Gujarati
+ * (Bengali → Odia removed; only languages with robust voice + translation support retained)
  */
 
 export interface Language {
   code: string            // Internal identifier used by the app
   translationCode: string // Actual BCP-47 code sent to Google Translate
-  voiceCode: string       // BCP-47 code for Web Speech API
+  voiceCode: string       // BCP-47 code for Web Speech API (recognition + synthesis)
   label: string           // Display name (English)
   nativeLabel: string     // Display name in native script
   flag: string            // Emoji flag
+  dir: "ltr" | "rtl"     // Text direction (for input/display)
+  /** Preferred voice name substrings for speechSynthesis (ordered by priority) */
+  voiceHints: string[]
+  /** Example placeholder shown in the chat input when this language is active */
+  placeholder: string
 }
 
 export const SUPPORTED_LANGUAGES: Language[] = [
-  { code: "en", translationCode: "en", voiceCode: "en-IN",  label: "English",   nativeLabel: "English",  flag: "🇮🇳" },
-  { code: "hi", translationCode: "hi", voiceCode: "hi-IN",  label: "Hindi",     nativeLabel: "हिन्दी",   flag: "🇮🇳" },
-  { code: "mr", translationCode: "mr", voiceCode: "mr-IN",  label: "Marathi",   nativeLabel: "मराठी",    flag: "🇮🇳" },
-  { code: "gu", translationCode: "gu", voiceCode: "gu-IN",  label: "Gujarati",  nativeLabel: "ગુજરાતી",  flag: "🇮🇳" },
-  { code: "bn", translationCode: "bn", voiceCode: "bn-IN",  label: "Bengali",   nativeLabel: "বাংলা",    flag: "🇮🇳" },
-  { code: "pa", translationCode: "pa", voiceCode: "pa-IN",  label: "Punjabi",   nativeLabel: "ਪੰਜਾਬੀ",   flag: "🇮🇳" },
-  { code: "ta", translationCode: "ta", voiceCode: "ta-IN",  label: "Tamil",     nativeLabel: "தமிழ்",    flag: "🇮🇳" },
-  { code: "te", translationCode: "te", voiceCode: "te-IN",  label: "Telugu",    nativeLabel: "తెలుగు",   flag: "🇮🇳" },
-  { code: "kn", translationCode: "kn", voiceCode: "kn-IN",  label: "Kannada",   nativeLabel: "ಕನ್ನಡ",    flag: "🇮🇳" },
-  { code: "ml", translationCode: "ml", voiceCode: "ml-IN",  label: "Malayalam", nativeLabel: "മലയാളം",   flag: "🇮🇳" },
-  { code: "ur", translationCode: "ur", voiceCode: "ur-IN",  label: "Urdu",      nativeLabel: "اردو",     flag: "🇵🇰" },
-  { code: "or", translationCode: "or", voiceCode: "or-IN",  label: "Odia",      nativeLabel: "ଓଡ଼ିଆ",    flag: "🇮🇳" },
+  {
+    code:            "en",
+    translationCode: "en",
+    voiceCode:       "en-IN",
+    label:           "English",
+    nativeLabel:     "English",
+    flag:            "🇮🇳",
+    dir:             "ltr",
+    voiceHints:      ["Google UK English Female", "Google UK English Male", "Google US English", "en-IN", "en-GB", "en-US"],
+    placeholder:     "Ask about Uttarakhand heritage products...",
+  },
+  {
+    code:            "hi",
+    translationCode: "hi",
+    voiceCode:       "hi-IN",
+    label:           "Hindi",
+    nativeLabel:     "हिन्दी",
+    flag:            "🇮🇳",
+    dir:             "ltr",
+    voiceHints:      ["Google हिन्दी", "Google Hindi", "hi-IN", "Lekha", "Rishi"],
+    placeholder:     "उत्तराखंड के जीआई उत्पादों के बारे में पूछें...",
+  },
+  {
+    code:            "mr",
+    translationCode: "mr",
+    voiceCode:       "mr-IN",
+    label:           "Marathi",
+    nativeLabel:     "मराठी",
+    flag:            "🇮🇳",
+    dir:             "ltr",
+    voiceHints:      ["Google मराठी", "Google Marathi", "mr-IN"],
+    placeholder:     "उत्तराखंडच्या वारसा उत्पादनांबद्दल विचारा...",
+  },
+  {
+    code:            "gu",
+    translationCode: "gu",
+    voiceCode:       "gu-IN",
+    label:           "Gujarati",
+    nativeLabel:     "ગુજરાતી",
+    flag:            "🇮🇳",
+    dir:             "ltr",
+    voiceHints:      ["Google ગુજરાતી", "Google Gujarati", "gu-IN"],
+    placeholder:     "ઉત્તરાખંડ ના GI ઉત્પાદનો વિશે પૂછો...",
+  },
 ]
 
 export const DEFAULT_LANGUAGE = SUPPORTED_LANGUAGES[0] // English
@@ -73,4 +113,29 @@ export async function translateText(
  */
 export function getLanguage(code: string): Language {
   return SUPPORTED_LANGUAGES.find((l) => l.code === code) ?? DEFAULT_LANGUAGE
+}
+
+/**
+ * Pick the best available speechSynthesis voice for a language.
+ * Iterates voiceHints (priority order) and returns the first match.
+ * Falls back to the first voice matching the voiceCode prefix.
+ */
+export function pickVoice(lang: Language): SpeechSynthesisVoice | null {
+  if (typeof window === "undefined") return null
+  const voices = window.speechSynthesis.getVoices()
+  if (!voices.length) return null
+
+  // 1. Try each hint string (case-insensitive substring match)
+  for (const hint of lang.voiceHints) {
+    const match = voices.find(
+      (v) =>
+        v.name.toLowerCase().includes(hint.toLowerCase()) ||
+        v.lang.toLowerCase().startsWith(hint.toLowerCase())
+    )
+    if (match) return match
+  }
+
+  // 2. Fallback: first voice whose lang prefix matches (e.g. "hi" in "hi-IN")
+  const prefix = lang.voiceCode.split("-")[0].toLowerCase()
+  return voices.find((v) => v.lang.toLowerCase().startsWith(prefix)) ?? null
 }

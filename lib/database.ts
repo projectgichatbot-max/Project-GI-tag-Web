@@ -35,7 +35,7 @@ async function connectDB() {
 
   if (!cached.promise) {
     const opts = {
-      bufferCommands: false,
+      bufferCommands: true, // Buffer queries during connect — prevents "too early" errors with fallback DNS
     }
 
     cached.promise = mongoose
@@ -46,8 +46,7 @@ async function connectDB() {
       })
       .catch((error) => {
         console.error('❌ MongoDB connection error:', error.message)
-        console.log('🔄 Falling back to Firebase database')
-        // Re-throw so outer await catch sets promise null and returns fallback
+        // Re-throw so outer await catch sets promise null and triggers DNS fallback
         throw error
       })
   }
@@ -74,7 +73,10 @@ async function connectDB() {
           console.log('🌐 Retrying MongoDB with fallback DNS resolvers')
         }
 
-        const opts = { bufferCommands: false }
+        // Fully disconnect first — resets Mongoose readyState so the retry starts clean
+        try { await mongoose.disconnect() } catch { /* ignore */ }
+
+        const opts = { bufferCommands: true } // Buffer queries during retry connect
         cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {
           console.log('✅ Connected to MongoDB (fallback DNS)')
           return m

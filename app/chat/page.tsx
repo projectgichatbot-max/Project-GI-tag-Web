@@ -10,7 +10,17 @@ import {
 } from "lucide-react"
 import { sendChatQuery } from "@/lib/chatbot-api"
 import { toast } from "sonner"
-import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE, translateText, type Language } from "@/lib/translate"
+import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE, translateText, pickVoice, type Language } from "@/lib/translate"
+
+// ── Client-side English detection (mirrors server-side isPredominantlyLatin) ─
+// Used to detect when a translation returned native script instead of English.
+function isPredominantlyLatin(text: string): boolean {
+  if (!text || text.length === 0) return false
+  const latinChars = (text.match(/[a-zA-Z]/g) ?? []).length
+  const nonAscii = (text.match(/[^\x00-\x7F]/g) ?? []).length
+  if (nonAscii > text.length * 0.3) return false
+  return latinChars / text.length > 0.35
+}
 
 // ─────────────────────────────────────────────
 // Types
@@ -46,7 +56,6 @@ const TAGS = [
   "Thulma Blanket",
   "Basmati Rice",
   "Bal Mithai",
-  "Bichhu Buti Fiber",
   "Mandua",
   "Jhangora",
 ]
@@ -103,7 +112,7 @@ export default function ChatPage() {
     // Stop any currently running instance before creating a new one
     try {
       if (recognitionRef.current) {
-        recognitionRef.current.onend = null // prevent the old onend from firing
+        recognitionRef.current.onend = null
         recognitionRef.current.stop()
       }
     } catch {
@@ -114,28 +123,37 @@ export default function ChatPage() {
     const rec = new SpeechRecognition()
     rec.continuous = false
     rec.interimResults = true
-    rec.lang = lang.voiceCode // 🔑 Dynamic language for voice input
+    rec.maxAlternatives = 3        // 🔑 Get top-3 candidates for better accuracy
+    rec.lang = lang.voiceCode      // 🔑 Dynamic language for voice input
 
     rec.onstart = () => setIsListening(true)
 
     rec.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript
-      setInputValue(transcript)
+      const result = event.results[0]
+
+      if (!result.isFinal) {
+        // Interim: show live transcription in the input field
+        setInputValue(result[0].transcript)
+        return
+      }
+
+      // Final result: pick the highest-confidence alternative
+      let bestTranscript = result[0].transcript
+      let bestConfidence = result[0].confidence ?? 0
+      for (let i = 1; i < result.length; i++) {
+        const confidence = result[i].confidence ?? 0
+        if (confidence > bestConfidence) {
+          bestConfidence = confidence
+          bestTranscript = result[i].transcript
+        }
+      }
+      setInputValue(bestTranscript)
     }
 
     rec.onerror = (event: any) => {
       setIsListening(false)
       if (event.error === "no-speech") {
         toast("No speech detected. Try speaking again!")
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: Date.now().toString(),
-            role: "bot",
-            content: "I didn't catch that. Please try speaking again!",
-            timestamp: new Date(),
-          }
-        ])
       } else {
         console.error("Speech recognition error:", event.error)
       }
@@ -210,20 +228,39 @@ export default function ChatPage() {
     try {
       // 2. Translate user input to English (if not already English)
       //    Use "auto" source — lets Google detect the actual script the user typed in.
-      //    This handles cases where user types Hindi text with Gujarati language selected etc.
+      //    This handles cases where user types Hindi text with Gujarati language selected.
       let queryInEnglish = text
-      if (selectedLang.translationCode !== "en") {
+      const isNonEnglish = selectedLang.translationCode !== "en"
+
+      if (isNonEnglish) {
         setIsTranslating(true)
-        queryInEnglish = await translateText(text, "auto", "en")
+        const translated = await translateText(text, "auto", "en")
         setIsTranslating(false)
+
+        // ── English validation ────────────────────────────────────────────
+        // If the translation returned native script instead of English
+        // (e.g., Google echoed Devanagari back), keep the original text.
+        // The chatbot backend will still try to match it via aliases and
+        // phonetic corrections (e.g., "tejpatta", "berinag" work directly).
+        if (isPredominantlyLatin(translated)) {
+          queryInEnglish = translated
+        } else {
+          // Translation failed — use original text and let the backend decide
+          queryInEnglish = text
+          console.warn("[chat] Translation returned non-Latin text; using original")
+        }
       }
 
-      // 3. Send English query to chatbot API (existing logic untouched)
-      const data = await sendChatQuery(queryInEnglish)
+      // 3. Send to chatbot API
+      //    Pass originalNative so the backend can fall back when queryInEnglish
+      //    is still non-English (backend has isPredominantlyEnglish() guard).
+      const data = await sendChatQuery(queryInEnglish, {
+        originalNative: isNonEnglish ? text : undefined,
+      })
 
       // 4. Translate English response back to user's language
       let finalResponse = data.response
-      if (selectedLang.translationCode !== "en") {
+      if (isNonEnglish) {
         setIsTranslating(true)
         finalResponse = await translateText(data.response, "en", selectedLang.translationCode)
         setIsTranslating(false)
@@ -346,8 +383,8 @@ export default function ChatPage() {
   }
 
   const voicePlaceholder = isListening
-    ? `Listening in ${selectedLang.label}... Speak now`
-    : `Ask in ${selectedLang.label} (${selectedLang.nativeLabel})...`
+    ? `🎤 Listening in ${selectedLang.label} (${selectedLang.nativeLabel})...`
+    : selectedLang.placeholder
 
   // ─────────────────────────────────────────────
   // Render
@@ -417,7 +454,7 @@ export default function ChatPage() {
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Info className="h-4 w-4 text-slate-500" />
-            <span>Powered by Next.js API</span>
+            <span>Powered by Uttarakhand Heritage</span>
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Landmark className="h-4 w-4 text-slate-500" />
@@ -666,6 +703,8 @@ export default function ChatPage() {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 disabled={isLoading || isTranslating}
+                dir={selectedLang.dir}
+                lang={selectedLang.voiceCode}
                 className="flex-1 bg-[#192231] border-slate-800 focus:border-amber-500/50 text-white h-11 px-4 rounded-xl placeholder:text-slate-500 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
               />
 

@@ -5,13 +5,28 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MapPin, Star, Shield, Award, Leaf, Users, Calendar, ChevronLeft, Play, Volume2, Loader2 } from "lucide-react"
+import { MapPin, Star, Shield, Award, Leaf, Users, Calendar, ChevronLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { useParams } from "next/navigation"
 import { productsApi, type Product, type Recipe } from "@/lib/api"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
+
+// ─── Minimal artisan shape needed by this page ────────────────────────────────
+interface LinkedArtisan {
+  _id: string
+  name: string
+  image: string
+  specialization: string
+  district: string
+  region: string
+  experience: string
+  bio: string
+  rating: number
+  reviewsCount: number
+  featured: boolean
+}
 
 export default function ProductDetailPage() {
   const params = useParams()
@@ -26,6 +41,8 @@ export default function ProductDetailPage() {
   const [newComment, setNewComment] = useState("")
   const [newUser, setNewUser] = useState("")
   const [activeTab, setActiveTab] = useState("overview")
+  const [linkedArtisan, setLinkedArtisan] = useState<LinkedArtisan | null>(null)
+  const [artisanLoading, setArtisanLoading] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -56,6 +73,24 @@ export default function ProductDetailPage() {
       active = false
     }
   }, [productId])
+
+  // ── Fetch real artisan linked to this product ────────────────────────────────
+  useEffect(() => {
+    if (!product?._id) return
+    let active = true
+    setArtisanLoading(true)
+    fetch(`/api/artisans?productId=${product._id}&limit=1`)
+      .then(r => r.json())
+      .then(json => {
+        if (!active) return
+        if (json.success && json.data?.length > 0) {
+          setLinkedArtisan(json.data[0])
+        }
+      })
+      .catch(() => {/* non-fatal, fall back to product.artisan */})
+      .finally(() => { if (active) setArtisanLoading(false) })
+    return () => { active = false }
+  }, [product?._id])
 
   if (loading) {
     return (
@@ -146,12 +181,6 @@ export default function ProductDetailPage() {
           <div className="space-y-4">
             <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
               <Image src={mainImage} alt={product.name} fill className="object-cover" priority />
-              {product.category === "Handicraft" && (
-                <Button size="sm" variant="secondary" className="absolute bottom-4 right-4">
-                  <Play className="h-4 w-4 mr-2" />
-                  Watch Making Process
-                </Button>
-              )}
             </div>
 
             <div className="grid grid-cols-4 gap-2">
@@ -203,10 +232,7 @@ export default function ProductDetailPage() {
               {product.giRegistrationNumber && <span className="block text-xs mt-2">GI Reg. No: {product.giRegistrationNumber}</span>}
             </div>
 
-            <Button variant="outline" size="lg" className="w-full bg-black text-white hover:bg-blue-500 hover:text-black">
-              <Volume2 className="h-4 w-4 mr-2" />
-              Ask AI Assistant About This Heritage Item
-            </Button>
+
 
             <div className="grid grid-cols-2 gap-4 py-4 border-t border-b">
               <div className="text-center">
@@ -399,34 +425,100 @@ export default function ProductDetailPage() {
             <TabsContent value="artisan" className="mt-8">
               <div className="max-w-4xl">
                 <h3 className="text-xl font-semibold mb-6">Artisan / Community</h3>
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-6">
-                      <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center">
-                        <Users className="h-12 w-12 text-muted-foreground" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-xl font-semibold mb-2">{product.artisan?.name || "Community Collective"}</h4>
-                        <div className="flex items-center text-muted-foreground mb-2">
-                          <MapPin className="h-4 w-4 mr-1" />
-                          {product.artisan?.village || product.artisan?.district || product.region}
-                        </div>
-                        <div className="flex items-center text-muted-foreground mb-4">
-                          <Calendar className="h-4 w-4 mr-1" />
-                          {product.artisan?.experience || "Generational craftsmanship"}
-                        </div>
-                        <p className="text-muted-foreground text-pretty">
-                          {product.artisan?.bio || product.culturalSignificance}
-                        </p>
 
-                        <div className="mt-4 flex gap-3">
-                          <Button variant="outline" size="sm">View Profile</Button>
-                          <Button variant="outline" size="sm">More Heritage Items</Button>
+                {artisanLoading ? (
+                  <div className="flex items-center gap-3 text-muted-foreground py-8">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>Loading artisan info...</span>
+                  </div>
+                ) : linkedArtisan ? (
+                  /* ── Real artisan from DB ── */
+                  <Card className="border shadow-sm">
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-6">
+                        {/* Photo */}
+                        <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden rounded-full bg-muted border-2 border-amber-200">
+                          <Image
+                            src={linkedArtisan.image || `https://randomuser.me/api/portraits/men/50.jpg`}
+                            alt={linkedArtisan.name}
+                            fill
+                            className="object-cover object-top"
+                            onError={(e) => { (e.target as HTMLImageElement).src = `https://randomuser.me/api/portraits/men/50.jpg` }}
+                          />
+                        </div>
+
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <h4 className="text-xl font-semibold">{linkedArtisan.name}</h4>
+                            {linkedArtisan.featured && (
+                              <Badge className="bg-amber-500 text-white text-xs border-0">⭐ Featured</Badge>
+                            )}
+                          </div>
+
+                          <div className="flex items-center text-muted-foreground text-sm mb-1">
+                            <MapPin className="h-3.5 w-3.5 mr-1" />
+                            {linkedArtisan.district}, {linkedArtisan.region}
+                          </div>
+
+                          <div className="flex items-center text-muted-foreground text-sm mb-1">
+                            <Calendar className="h-3.5 w-3.5 mr-1" />
+                            {linkedArtisan.experience} experience
+                          </div>
+
+                          <div className="flex items-center gap-1 mb-3">
+                            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                            <span className="text-sm font-medium">{(linkedArtisan.rating || 4.5).toFixed(1)}</span>
+                            <span className="text-xs text-muted-foreground">({linkedArtisan.reviewsCount || 0} reviews)</span>
+                          </div>
+
+                          <Badge variant="secondary" className="mb-3 text-xs">{linkedArtisan.specialization}</Badge>
+
+                          <p className="text-muted-foreground text-sm leading-relaxed mb-4">{linkedArtisan.bio}</p>
+
+                          <div className="flex gap-3">
+                            <Link href={`/artisans/${linkedArtisan._id}`}>
+                              <Button size="sm" className="bg-black text-white hover:bg-black/80">View Profile</Button>
+                            </Link>
+                            <Link href={`/artisans?specialization=${encodeURIComponent(linkedArtisan.specialization)}`}>
+                              <Button variant="outline" size="sm">More by this Artisan</Button>
+                            </Link>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  /* ── Fallback: product.artisan static data or generic ── */
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-6">
+                        <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center">
+                          <Users className="h-12 w-12 text-muted-foreground" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-xl font-semibold mb-2">{product.artisan?.name || "Community Collective"}</h4>
+                          <div className="flex items-center text-muted-foreground mb-2">
+                            <MapPin className="h-4 w-4 mr-1" />
+                            {product.artisan?.village || product.artisan?.district || product.region}
+                          </div>
+                          <div className="flex items-center text-muted-foreground mb-4">
+                            <Calendar className="h-4 w-4 mr-1" />
+                            {product.artisan?.experience || "Generational craftsmanship"}
+                          </div>
+                          <p className="text-muted-foreground text-pretty">
+                            {product.artisan?.bio || product.culturalSignificance}
+                          </p>
+                          <div className="mt-4">
+                            <Link href="/artisans">
+                              <Button variant="outline" size="sm">Browse All Artisans</Button>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             </TabsContent>
 

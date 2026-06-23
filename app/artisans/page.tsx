@@ -411,18 +411,26 @@ export default function ArtisansPage() {
                 <div className="space-y-2">
                   <Button
                     id="qf-featured"
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
-                    className={`w-full justify-start text-sm ${!hasActiveFilters && sortBy === 'featured' ? 'bg-foreground text-background' : 'bg-muted/50 hover:bg-muted'}`}
+                    className={`w-full justify-start text-sm font-medium transition-all ${
+                      !hasActiveFilters && sortBy === 'featured'
+                        ? 'bg-black text-white hover:bg-black/90 hover:text-white ring-2 ring-amber-400'
+                        : 'bg-black text-white hover:bg-black/80 hover:text-white'
+                    }`}
                     onClick={() => clearAllFilters()}
                   >
                     ⭐ Featured Artisans
                   </Button>
                   <Button
                     id="qf-artists"
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
-                    className={`w-full justify-start text-sm ${searchQuery === 'art craft wood carving weaving' ? 'bg-foreground text-background' : 'bg-muted/50 hover:bg-muted'}`}
+                    className={`w-full justify-start text-sm font-medium transition-all ${
+                      searchQuery === 'art craft wood carving weaving'
+                        ? 'bg-black text-white hover:bg-black/90 hover:text-white ring-2 ring-amber-400'
+                        : 'bg-black text-white hover:bg-black/80 hover:text-white'
+                    }`}
                     onClick={() => {
                       setSearchQuery('art craft wood carving weaving')
                       setSelectedSpecialization('all')
@@ -433,9 +441,13 @@ export default function ArtisansPage() {
                   </Button>
                   <Button
                     id="qf-farmers"
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
-                    className={`w-full justify-start text-sm ${searchQuery === 'organic farming cultivation' ? 'bg-foreground text-background' : 'bg-muted/50 hover:bg-muted'}`}
+                    className={`w-full justify-start text-sm font-medium transition-all ${
+                      searchQuery === 'organic farming cultivation'
+                        ? 'bg-black text-white hover:bg-black/90 hover:text-white ring-2 ring-amber-400'
+                        : 'bg-black text-white hover:bg-black/80 hover:text-white'
+                    }`}
                     onClick={() => {
                       setSearchQuery('organic farming cultivation')
                       setSelectedSpecialization('all')
@@ -446,21 +458,29 @@ export default function ArtisansPage() {
                   </Button>
                   <Button
                     id="qf-kumaon"
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
-                    className={`w-full justify-start text-sm ${selectedRegion === 'Kumaon' ? 'bg-foreground text-background' : 'bg-muted/50 hover:bg-muted'}`}
+                    className={`w-full justify-start text-sm font-medium transition-all ${
+                      selectedRegion === 'Kumaon'
+                        ? 'bg-black text-white hover:bg-black/90 hover:text-white ring-2 ring-amber-400'
+                        : 'bg-black text-white hover:bg-black/80 hover:text-white'
+                    }`}
                     onClick={() => { setSelectedRegion('Kumaon'); setSearchQuery('') }}
                   >
-                    🏔 Kumaon Region
+                    🏔️ Kumaon Region
                   </Button>
                   <Button
                     id="qf-garhwal"
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
-                    className={`w-full justify-start text-sm ${selectedRegion === 'Garhwal' ? 'bg-foreground text-background' : 'bg-muted/50 hover:bg-muted'}`}
+                    className={`w-full justify-start text-sm font-medium transition-all ${
+                      selectedRegion === 'Garhwal'
+                        ? 'bg-black text-white hover:bg-black/90 hover:text-white ring-2 ring-amber-400'
+                        : 'bg-black text-white hover:bg-black/80 hover:text-white'
+                    }`}
                     onClick={() => { setSelectedRegion('Garhwal'); setSearchQuery('') }}
                   >
-                    🏔 Garhwal Region
+                    🏔️ Garhwal Region
                   </Button>
                 </div>
               </div>

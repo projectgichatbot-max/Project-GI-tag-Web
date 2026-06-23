@@ -15,9 +15,15 @@ export async function GET(request: NextRequest) {
     const specialization = searchParams.get('specialization')
     const search = searchParams.get('search')
     const featured = searchParams.get('featured')
+    const productId = searchParams.get('productId') // filter by linked product ID
 
     // Build filter object
     const filter: any = {}
+
+    // Filter by linked product ID — finds artisans whose products[] contains this id
+    if (productId) {
+      filter.products = productId
+    }
 
     if (region && region !== 'all') {
       filter.region = { $regex: region, $options: 'i' }
